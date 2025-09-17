@@ -7,11 +7,11 @@ function Home() {
   const dispath = useDispatch()
   useEffect(() => {
     dispath(toggleIsvisibalTrue())
-  }, )
+  },[])
 
   return (
     <>
-      <div className='w-full h-fit flex justify-center  md:justify-between items-center flex-wrap gap-4'>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" >
         <VideoCard />
         <VideoCard />
         <VideoCard />
@@ -27,3 +27,4 @@ function Home() {
 }
 
 export default Home
+

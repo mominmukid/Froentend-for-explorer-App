@@ -59,7 +59,7 @@ function Navitems({ handelList, handleIsBlock }) {
          <div className='w-[20%] md:w-[20%] h-full flex justify-evenly items-center dark:text-white'>
 
             {/* Upload button (desktop only) */}
-            <span className='hidden md:block text-[30px] w-12 h-12 rounded-full hover:bg-gray-200 hover:ring-primary-200 transition-all md:flex justify-center items-center cursor-pointer dark:hover:bg-gray-800 text-gray-800'>
+            <span className='hidden dark:text-gray-200 text-[30px] w-12 h-12 rounded-full hover:bg-gray-200 hover:ring-primary-200 transition-all md:flex justify-center items-center cursor-pointer dark:hover:bg-gray-800 text-gray-800'>
                <MdOutlineVideoCall />
             </span>
 

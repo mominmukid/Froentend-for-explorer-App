@@ -17,7 +17,7 @@ import { useSelector } from "react-redux";
 function SideBox() {
   const toggle = useSelector(state => state.video.isvisibal);
   return (
-    <div className={`${toggle?"md:flex":"hidden"} hidden flex-col justify-between w-[240px] dark:bg-[#202222] h-screen fixed top-0 left-0 overflow-y-auto border-r-2 border-gray-100 dark:border-[#181818]`}>
+    <div className={` hidden  flex-col justify-between w-[240px] dark:bg-[#202222] h-screen fixed top-0 left-0 overflow-y-auto border-r-2 border-gray-100 dark:border-[#181818] ${toggle ? "md:flex" : "hidden"}`}>
       {/* Sidebar content */}
       <div className="flex flex-col items-center w-full">
         {/* Navigation Links */}
@@ -28,11 +28,11 @@ function SideBox() {
           {/* for playlist for mobile screen */}
           <NavLink to="/playlist" className='w-full hover:bg-gray-300  cursor-pointer rounded-full flex justify-start pl-5  gap-2 p-2 transition  duration-100 ease-in-out dark:text-white dark:hover:bg-gray-800'><span className='flex justify-center items-center text-2xl'><MdOutlinePlaylistPlay /> </span> <span className='font-bold text-gray-700 dark:text-gray-100'>playlists</span></NavLink>
           {/* for History for mobile screen */}
-          <NavLink to="/playlist" className='w-full hover:bg-gray-300  cursor-pointer rounded-full flex justify-start pl-5  gap-2 p-2 transition  duration-100 ease-in-out dark:text-white dark:hover:bg-gray-800'><span className='flex justify-center items-center text-xl'><FaHistory /> </span> <span className='font-bold text-gray-700 dark:text-gray-100 '>History</span></NavLink>
+          <NavLink to="/history" className='w-full hover:bg-gray-300  cursor-pointer rounded-full flex justify-start pl-5  gap-2 p-2 transition  duration-100 ease-in-out dark:text-white dark:hover:bg-gray-800'><span className='flex justify-center items-center text-xl'><FaHistory /> </span> <span className='font-bold text-gray-700 dark:text-gray-100 '>History</span></NavLink>
           {/* for Subscription for mobile screen */}
-          <NavLink to="/playlist" className='w-full hover:bg-gray-200  cursor-pointer rounded-full flex justify-start pl-5  gap-2 p-2 transition  duration-100 ease-in-out dark:text-white dark:hover:bg-gray-800'><span className='flex justify-center items-center text-xl'>< MdSubscriptions /> </span> <span className='font-bold text-gray-700 dark:text-gray-100 '>Subsciption</span></NavLink>
+          <NavLink to="/subscription" className='w-full hover:bg-gray-200  cursor-pointer rounded-full flex justify-start pl-5  gap-2 p-2 transition  duration-100 ease-in-out dark:text-white dark:hover:bg-gray-800'><span className='flex justify-center items-center text-xl'>< MdSubscriptions /> </span> <span className='font-bold text-gray-700 dark:text-gray-100 '>Subsciption</span></NavLink>
           {/* for liked for mobile screen */}
-          <NavLink to="/playlist" className='w-full hover:bg-gray-200  cursor-pointer rounded-full flex justify-start pl-5  gap-2 p-2 transition  duration-100 ease-in-out dark:text-white dark:hover:bg-gray-800'><span className='flex justify-center items-center text-xl '><AiOutlineLike /> </span> <span className='font-bold text-gray-700 dark:text-gray-100'>Liked</span></NavLink>
+          <NavLink to="/like" className='w-full hover:bg-gray-200  cursor-pointer rounded-full flex justify-start pl-5  gap-2 p-2 transition  duration-100 ease-in-out dark:text-white dark:hover:bg-gray-800'><span className='flex justify-center items-center text-xl '><AiOutlineLike /> </span> <span className='font-bold text-gray-700 dark:text-gray-100'>Liked</span></NavLink>
           {/* Cancle button */}
         </div>
       </div>

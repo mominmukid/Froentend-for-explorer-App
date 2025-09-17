@@ -11,24 +11,21 @@ function VideoCard() {
    }
    return (
 
-      <NavLink to="/video" className="w-[90%] sm:w-[45%] md:w-[45%] lg:w-[30%] bg-white border border-gray-200 rounded-[30px] shadow-sm dark:bg-gray-800 dark:border-gray-700 overflow-hidden cursor-pointer" onClick={handlesidebar}>
-         <img className="rounded-t-lg" src="public\Images\jms-kFHz9Xh3PPU-unsplash.jpg" alt="Video" />
-         <div className='w-full flex justify-between items-center'>
-            <div className='w-[20%] h-fit p-2'>
-               <p className='w-10 h-10 flex justify-center items-center rounded-full text-6xl'><IoPersonCircleSharp /></p>
-            </div>
-
-            <div className='w-[70%] text-[17px] pb-2'>
-               <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. </p>
-               <p className='text-gray-500'> Channel Name</p>
-               <p className='w-full flex justify-start items-start text-gray-500 text-[14px]'>
-                  <span >415K Views</span>
-                  <span className='w-fit flex justify-end items-end text-xl'> <LuDot /> </span>
-                  <span >2 years</span>
-               </p>
+      <NavLink to="/video" className="group cursor-pointer" onClick={handlesidebar}>
+         <div className="relative mb-3" >
+            <img src="https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=400&h=225&fit=crop" alt="Video thumbnail" className="w-full aspect-video object-cover rounded-lg group-hover:rounded-none transition-all duration-200" />
+            <span className="absolute bottom-2 right-2 bg-black bg-opacity-80 text-xs px-1 py-0.5 rounded text-white" >10:24</span>
+         </div>
+         <div className="flex gap-3" >
+            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=36&h=36&fit=crop&crop=face" alt="Channel avatar" className="w-9 h-9 rounded-full flex-shrink-0" data-id="channel-avatar-1" />
+            <div >
+               <h3 className="font-medium line-clamp-2 mb-1 group-hover:text-blue-400" >Building Modern Web Applications with React and TypeScript</h3>
+               <p className="text-gray-700 dark:text-gray-300 text-sm mb-1" >TechGuru</p>
+               <p className="text-gray-700 dark:text-gray-300 text-sm" >125K views • 2 days ago</p>
             </div>
          </div>
       </NavLink>
+
    )
 }
 

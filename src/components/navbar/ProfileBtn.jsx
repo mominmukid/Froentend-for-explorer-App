@@ -2,13 +2,14 @@ import React from 'react'
 import { MdOutlineDashboard } from "react-icons/md";
 import { MdOutlinePerson } from "react-icons/md";
 import { MdLogout } from "react-icons/md";
+import { NavLink } from 'react-router';
 
 function ProfileBtn({ isblock }) {
    return (
       <div>
       <li className={`${isblock ? "block" : "hidden"} fixed top-15 right-4 sm:right-36 lg:right-42 rounded-[20px] overflow-hidden h-fit min-w-[40%] sm:min-w-[13%] bg-white flex flex-col justify-start   border-gray-300 border-1 pb-1`} >
-         <ul className='w-full  pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer'>
-            <span className='text-[23px] font-extrabold'><MdOutlineDashboard /></span><span className='text-[18px] font-semibold'>Dashboard</span></ul>
+         <NavLink to="/dashboard" className='w-full  pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer'>
+            <span className='text-[23px] font-extrabold'><MdOutlineDashboard /></span><span className='text-[18px] font-semibold'>Dashboard</span></NavLink>
 
          <ul className='w-full  pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer'>
             <span className='text-[25px] font-extrabold'><MdOutlinePerson /></span><span className='text-[18px] font-semibold'>Profile</span></ul>
