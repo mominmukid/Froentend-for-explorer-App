@@ -1,12 +1,16 @@
 import React from 'react'
 import { Route, Routes } from 'react-router'
+import { useSelector } from 'react-redux'
 import Home from './Home'
 import About from './About'
 import Contact from './Contact'
-import Navbar from '../components/Navbar'
-import SideBox from '../components/Sidebox'
+import Navbar from '../components/navbar/Navbar'
+import SideBox from '../components/navbar/Sidebox'
+import VideoPage from './VideoPage'
+
 
 function Layout() {
+   const toggle = useSelector(state => state.video.isvisibal);
    return (
       <div>
          {/* Navbar */}
@@ -15,16 +19,14 @@ function Layout() {
          </div>
 
          {/* Sidebar */}
-         <div className='h-screen bg-red-600 fixed top-12 left-0 z-40 hidden lg:block'>
-            <SideBox />
-         </div>
-
+         <SideBox />
          {/* Main Content */}
-         <div className="ml-0 mt-13 p-4 lg:ml-[240px] dark:bg-[#202222] dark:text-white">
+         <div className={`ml-0 mt-13 p-4 dark:bg-[#202222] dark:text-white bg-[#f8f9fc]   hide-scrollbar ${toggle?"md:ml-[240px]":"lg:ml-0"}`}>
             <Routes>
                <Route path='/' element={<Home />} />
                <Route path='/about' element={<About />} />
                <Route path='/contact' element={<Contact />} />
+               <Route path='/video' element={<VideoPage />} />
             </Routes>
          </div>
       </div>
