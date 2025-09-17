@@ -64,7 +64,7 @@ function Navitems({ handelList, handleIsBlock }) {
             </span>
 
             {/* Profile button */}
-            <span className='text-[30px] lg:w-12 lg:h-12 w-fit h-fit rounded-full hover:bg-gray-200 hover:ring-primary-200 transition-all overflow-hidden flex justify-center items-center cursor-pointer dark:hover:bg-gray-800 text-gray-800' onClick={handleIsBlock}>
+            <span className='text-[30px] dark:text-gray-100 lg:w-12 lg:h-12 w-fit h-fit rounded-full hover:bg-gray-200 hover:ring-primary-200 transition-all overflow-hidden flex justify-center items-center cursor-pointer dark:hover:bg-gray-800 text-gray-800' onClick={handleIsBlock}>
                <CgProfile />
             </span>
 
