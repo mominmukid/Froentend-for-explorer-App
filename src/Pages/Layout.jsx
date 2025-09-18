@@ -10,6 +10,8 @@ import VideoPage from './VideoPage'
 import Subscription from './Subscription'
 import Playlist from './Playlist'
 import Dashboard from './Dashboard'
+import Login from './Login'
+import Register from './Register'
 
 
 function Layout() {
@@ -33,6 +35,8 @@ function Layout() {
                <Route path='/subscription' element={<Subscription />} />
                <Route path='/playlist' element={<Playlist />} />
                <Route path='/dashboard' element={<Dashboard />} />
+               <Route path='/login' element={<Login />} />
+               <Route path='/register' element={<Register />} />
             </Routes>
          </div>
       </div>

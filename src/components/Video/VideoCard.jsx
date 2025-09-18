@@ -11,7 +11,7 @@ function VideoCard() {
    }
    return (
 
-      <NavLink to="/video" className="group cursor-pointer" onClick={handlesidebar}>
+      <NavLink to="/video" className="group cursor-pointer bg-gray-200 dark:bg-gray-800 overflow-hidden rounded-md" onClick={handlesidebar}>
          <div className="relative mb-3" >
             <img src="https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=400&h=225&fit=crop" alt="Video thumbnail" className="w-full aspect-video object-cover rounded-lg group-hover:rounded-none transition-all duration-200" />
             <span className="absolute bottom-2 right-2 bg-black bg-opacity-80 text-xs px-1 py-0.5 rounded text-white" >10:24</span>

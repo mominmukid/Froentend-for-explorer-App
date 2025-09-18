@@ -9,13 +9,13 @@ function LikeVideo() {
     {/* <!-- Main Content Area --> */}
     <main className="flex-1 p-6 ml-0  pt-20" data-id="liked-videos-main">
       {/* <!-- Header --> */}
-      <div className="mb-8" data-id="liked-videos-header">
-        <h1 className="text-3xl font-bold mb-2" data-id="liked-videos-title">Liked Videos</h1>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2" >Liked Videos</h1>
         <p className="text-gray-700 dark:text-gray-300" >Videos you've liked</p>
       </div>
 
       {/* <!-- Controls --> */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6" data-id="liked-videos-controls">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6" >
         <div className="flex items-center gap-4 text-gray-700 dark:text-gray-300" >
           <span>24 videos</span>
           <span>•</span>
