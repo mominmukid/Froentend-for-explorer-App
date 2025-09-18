@@ -12,6 +12,9 @@ import Playlist from './Playlist'
 import Dashboard from './Dashboard'
 import Login from './Login'
 import Register from './Register'
+import Upload from './Upload'
+import UserSetting from './UserSetting'
+import Videoupdate from './Videoupdate'
 
 
 function Layout() {
@@ -37,6 +40,9 @@ function Layout() {
                <Route path='/dashboard' element={<Dashboard />} />
                <Route path='/login' element={<Login />} />
                <Route path='/register' element={<Register />} />
+               <Route path='/upload' element={<Upload />} />
+               <Route path='/video/update' element={<Videoupdate />} />
+               <Route path='/setting' element={<UserSetting />} />
             </Routes>
          </div>
       </div>

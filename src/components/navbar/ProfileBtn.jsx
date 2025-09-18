@@ -4,6 +4,7 @@ import { MdOutlinePerson } from "react-icons/md";
 import { MdLogout } from "react-icons/md";
 import { NavLink } from 'react-router';
 import { RiLoginBoxLine } from "react-icons/ri";
+import { IoIosSettings } from "react-icons/io";
 
 function ProfileBtn({ isblock,setIsblock }) {
  
@@ -16,8 +17,10 @@ function ProfileBtn({ isblock,setIsblock }) {
             <NavLink to="/login" className='w-full  pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer' onClick={()=>{setIsblock(false)}}>
                <span className='text-[23px] font-extrabold'><RiLoginBoxLine /></span><span className='text-[18px] font-semibold'>Login</span></NavLink>
 
-            <ul className='w-full  pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer' onClick={()=>{setIsblock(false)}}>
-               <span className='text-[25px] font-extrabold'><MdOutlinePerson /></span><span className='text-[18px] font-semibold'>Profile</span></ul>
+               <NavLink to="/setting" className='w-full  pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer' onClick={()=>{setIsblock(false)}}>
+               <span className='text-[23px] font-extrabold'><IoIosSettings /></span><span className='text-[18px] font-semibold'>Setting</span></NavLink>
+
+          
             <hr className='text-gray-400 mt-2' />
             <ul className='w-full  pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer' onClick={()=>{setIsblock(false)}}>
                <span className='text-[25px] text-red-600 font-extrabold'><MdLogout /></span><span className='text-[18px] font-semibold text-red-600'>Logout </span></ul>

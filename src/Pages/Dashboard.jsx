@@ -1,8 +1,13 @@
 import React from 'react'
 import DashboardVideo from '../components/Video/DashboardVideo'
 import { MdCloudUpload } from "react-icons/md";
-
+import { useNavigate } from 'react-router';
 function Dashboard() {
+   const navigate = useNavigate();
+
+   const handleUploadClick = () => {
+      navigate('/upload');
+   };
    return (
       <>
          <div className="flex">
@@ -11,6 +16,21 @@ function Dashboard() {
             <main className="flex-1 p-6 ml-0 pt-20">
 
                {/* <!-- Header --> */}
+               <div class="relative w-full h-48 md:h-60 bg-gradient-to-r from-blue-500 to-purple-600 mb-20">
+                  <img
+                     src="https://source.unsplash.com/random/1600x400/?nature,abstract"
+                     alt=""
+                     class="w-full h-full object-cover"
+                  />
+
+                  <div class="absolute -bottom-16 left-6 flex items-center">
+                     <img
+                        src="https://i.pravatar.cc/150?img=5"
+                        alt="User Avatar"
+                        class="w-32 h-32 rounded-full border-4 border-white dark:border-gray-900 shadow-lg object-cover"
+                     />
+                  </div>
+               </div>
                <div className="mb-8">
                   <h1 className="text-3xl font-bold mb-2">Creator Dashboard</h1>
                   <p className="text-gray-600 dark:text-gray-200">
@@ -50,7 +70,7 @@ function Dashboard() {
 
                {/* <!-- Action Buttons --> */}
                <div className="flex flex-wrap gap-4 mb-8">
-                  <button className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-medium flex items-center gap-2 cursor-pointer">
+                  <button className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-medium flex items-center gap-2 cursor-pointer" onClick={handleUploadClick}>
                      <MdCloudUpload />
                      Upload Video
                   </button>
