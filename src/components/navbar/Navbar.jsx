@@ -8,8 +8,6 @@ function Navbar() {
    // State to control sidebar toggle (true = closed, false = open)
    const [cancle, setcancle] = useState(true)
    const [isblock, setIsblock] = useState(false);
-
-
    // Function to toggle sidebar state
    const handelList = () => {
       setcancle(!cancle)
@@ -28,10 +26,10 @@ function Navbar() {
             {/* Navigation items in the center/left */}
             <ul className='w-full h-full flex justify-evenly md:justify-between md:px-5 items-center'>
                <Navitems handelList={handelList} handleIsBlock={handleIsBlock} />
-               <ProfileBtn isblock={isblock} handleIsBlock={handleIsBlock} />
+               <ProfileBtn isblock={isblock} handleIsBlock={handleIsBlock} setIsblock={setIsblock} />
             </ul>
             {/* Sidebar (mobile menu) that toggles open/close */}
-            <Sidebar cancle={cancle} handelList={handelList} />
+            <Sidebar cancle={cancle} setcancle={setcancle} />
          </li>
       </div>
    )

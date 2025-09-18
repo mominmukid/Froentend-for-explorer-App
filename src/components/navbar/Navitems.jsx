@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState } from 'react';
 import { FaRegCirclePlay } from "react-icons/fa6";
-import { NavLink, useNavigate } from 'react-router';
+import { NavLink } from 'react-router';
 import { PiListBold } from "react-icons/pi";
 import { IoMdSearch } from "react-icons/io";
 import { MdOutlineVideoCall } from "react-icons/md";
@@ -10,8 +10,8 @@ import { GoSun } from "react-icons/go";
 import { IoMoon } from "react-icons/io5";
 
 
-function Navitems({ handelList, handleIsBlock }) {
-    const navigate = useNavigate();
+function Navitems({ handelList,  handleIsBlock }) {
+   cancelAnimationFrame
 
    // ✅ Dark mode state
    const [isDark, setisDark] = useState(false);
@@ -70,11 +70,6 @@ function Navitems({ handelList, handleIsBlock }) {
                <CgProfile />
             </span>
 
-            {/* Sign In button (desktop only) */}
-            {/* ⚠️ class → should be className in React */}
-            <button className="transition h-fit delay-150 duration-300 ease-in-out cursor-pointer bg-[#7341ff] dark:bg-[#20b8cd] dark:text-black dark:hover:bg-[#10aabf] px-[20px] py-[8px] rounded-full text-white hover:bg-[#5222d7] hidden lg:block" onClick={()=>{navigate("/login")}}>
-               Sign In
-            </button>
 
             {/* Dark/Light mode toggle */}
             <span

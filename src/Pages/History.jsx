@@ -38,7 +38,7 @@ function History() {
 
 
             {/* <!-- History Item 2 --> */}
-            <div className="flex sm:flex-col flex-wrap  gap-4 p-3 rounded-lg " >
+            <div className="flex lg:flex-col flex-wrap  gap-4 p-3 rounded-lg " >
               <HistoryVideo />
               <HistoryVideo />
               <HistoryVideo />
