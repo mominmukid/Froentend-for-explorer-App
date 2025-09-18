@@ -7,7 +7,7 @@ function LikeVideo() {
   {/* <!-- Main Content --> */}
   <div className="flex">
     {/* <!-- Main Content Area --> */}
-    <main className="flex-1 p-6 ml-0  pt-20" data-id="liked-videos-main">
+    <main className="flex-1 p-6 ml-0  pt-20" >
       {/* <!-- Header --> */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2" >Liked Videos</h1>
@@ -24,7 +24,7 @@ function LikeVideo() {
       </div>
 
       {/* <!-- Video List --> */}
-      <div className="space-y-4" data-id="liked-videos-list">
+      <div className="space-y-4" >
         <HistoryVideo/>
         <HistoryVideo/>
         <HistoryVideo/>
@@ -32,7 +32,7 @@ function LikeVideo() {
 
       {/* <!-- Load More --> */}
       <div className="text-center mt-8" >
-        <button className="bg-gray-300 cursor-pointer hover:text-white hover:bg-gray-600 px-6 py-3 rounded-lg font-medium">
+        <button className="bg-gray-300 cursor-pointer hover:text-white hover:bg-gray-600 px-6 py-3 rounded-lg font-medium text-gray-700">
           Load More Videos
         </button>
       </div>

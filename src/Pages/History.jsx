@@ -37,8 +37,8 @@ function History() {
             <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200" >All</h2>
 
 
-            {/* <!-- History Item 2 --> */}
-            <div className="flex lg:flex-col flex-wrap  gap-4 p-3 rounded-lg " >
+           
+            <div className="space-y-4 flex-1 justify-center items-center gap-5 " >
               <HistoryVideo />
               <HistoryVideo />
               <HistoryVideo />
