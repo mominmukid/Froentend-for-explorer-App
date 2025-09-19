@@ -2,31 +2,72 @@ import React, { useState } from "react";
 import { FaRegCirclePlay } from "react-icons/fa6";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router";
+import { toast } from "react-toastify";
+import { useForm } from "react-hook-form";
+import { IoMdEyeOff } from "react-icons/io";
+import { IoEye } from "react-icons/io5";
+import { useDispatch, useSelector } from "react-redux";
+import { loginAsyncUser, getUser } from "../store/UserSlice";
 function Login() {
-   const nevigate=useNavigate()
-   const [passwordVisible, setPasswordVisible] = useState(false);
+   const {
+      register,
+      handleSubmit,
+      formState: { errors, isSubmitting },
+   } = useForm({
+      mode: "onBlur", // 👈 validate when field loses focus (can use "onChange" for real-time)
+   });
 
-   const handleSubmit = (e) => {
-      e.preventDefault();
-      alert("Login functionality would be implemented here");
+   const navigate = useNavigate();
+   const [passwordVisible, setPasswordVisible] = useState(false);
+   const dispatch = useDispatch();
+   const user = useSelector(getUser);
+   const onSubmit = async (formData) => {
+      await dispatch(loginAsyncUser(formData));
+        
+        
+      if (user) {
+         toast.success("Login page is under development", {
+            position: "top-right",
+            autoClose: 2000,
+            theme: "dark",
+         })
+         navigate("/");
+         return;
+      }else{
+            toast.error("Login failed. Please try again.", {
+               position: "top-right",
+               autoClose: 2000,
+               theme: "dark",
+            });
+            navigate("/login");
+            return;
+         }
+      
    };
 
    return (
-      <div className=" min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
          {/* Main Container */}
          <div className="w-full max-w-md mx-auto p-6 ">
             {/* Logo */}
             <div className="text-center mb-8">
-               <a href="/" className="inline-flex justify-start items-center ml-[-2.5rem]   gap-2 mb-4">
-                  <span className="text-red-500 text-2xl mt-1"><FaRegCirclePlay /></span>
+               <a
+                  href="/"
+                  className="inline-flex justify-start items-center ml-[-2.5rem] gap-2 mb-4"
+               >
+                  <span className="text-red-500 text-2xl mt-1">
+                     <FaRegCirclePlay />
+                  </span>
                   <span className="text-2xl font-bold">TubeClone</span>
                </a>
                <h1 className="text-3xl font-bold mb-2">Welcome back</h1>
-               <p className="text-gray-700 dark:text-gray-300">Sign in to your account</p>
+               <p className="text-gray-700 dark:text-gray-300">
+                  Sign in to your account
+               </p>
             </div>
 
             {/* Login Form */}
-            <form className="space-y-6" onSubmit={handleSubmit}>
+            <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
                {/* Email Field */}
                <div>
                   <label
@@ -39,13 +80,28 @@ function Login() {
                      <input
                         type="email"
                         id="email"
-                        name="email"
-                        required
-                        className="w-full px-4 py-3 dark:bg-gray-800 bg-gray-100 shadow-md shadow-gray-600 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pl-12"
                         placeholder="Enter your email"
+                        className={`w-full px-4 py-3 dark:bg-gray-800 bg-gray-100 shadow-md shadow-gray-600
+      border ${errors.email ? "border-red-500" : "border-gray-600"}
+      rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500`}
+                        {...register("email", {
+                           required: "Email is required",
+                           pattern: {
+                              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                              message: "Enter a valid email",
+                           },
+                        })}
                      />
-                     <i className="w-5 h-5 text-gray-400 absolute left-4 top-3.5" data-lucide="mail"></i>
+                     <i
+                        className="w-5 h-5 text-gray-400 absolute left-4 top-3.5"
+                        data-lucide="mail"
+                     ></i>
                   </div>
+                  {errors.email && (
+                     <span className="text-red-500 text-sm m-1 block">
+                        {errors.email.message}
+                     </span>
+                  )}
                </div>
 
                {/* Password Field */}
@@ -60,64 +116,70 @@ function Login() {
                      <input
                         type={passwordVisible ? "text" : "password"}
                         id="password"
-                        name="password"
-                        required
-                        className="w-full px-4 py-3 dark:bg-gray-800 bg-gray-100 shadow-md shadow-gray-600 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pl-12 pr-12"
                         placeholder="Enter your password"
+                        className={`w-full px-4 py-3 dark:bg-gray-800 bg-gray-100 shadow-md shadow-gray-600 
+                border ${errors.password ? "border-red-500" : "border-gray-600"} 
+                rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pl-12 pr-12`}
+                        {...register("password", {
+                           required: "Password is required",
+                           minLength: { value: 6, message: "Min length is 6" },
+                           maxLength: { value: 20, message: "Max length is 20" },
+                        })}
                      />
-                     <i className="w-5 h-5 text-gray-400 absolute left-4 top-3.5" data-lucide="lock"></i>
+                     <i
+                        className="w-5 h-5 text-gray-400 absolute left-4 top-3.5"
+                        data-lucide="lock"
+                     ></i>
                      <button
                         type="button"
                         onClick={() => setPasswordVisible(!passwordVisible)}
-                        className="absolute right-4 top-3.5 text-gray-400 hover:text-gray-300"
+                        className="absolute right-4 top-3.5 text-gray-600 hover:text-gray-700 dark:text-gray-300 hover:dark:text-gray-400  flex items-center justify-center"
                      >
-                        <i data-lucide={passwordVisible ? "eye" : "eye-off"} className="w-5 h-5"></i>
+                        {passwordVisible ? <IoMdEyeOff /> : <IoEye />}
                      </button>
                   </div>
+                  {errors.password && (
+                     <span className="text-red-500 text-sm m-1 block">
+                        {errors.password.message}
+                     </span>
+                  )}
                </div>
 
-               {/* Remember & Forgot Password */}
-               <div className="flex items-center justify-between">
-                  <label className="flex items-center">
-                     <input
-                        type="checkbox"
-                        className="w-4 h-4 text-blue-600 bg-gray-800 border-gray-600 rounded focus:ring-blue-500"
-                     />
-                     <span className="ml-2 text-sm text-gray-800 dark:text-gray-300">Remember me</span>
-                  </label>
+               {/* Remember Me */}
 
-               </div>
 
                {/* Sign In Button */}
                <button
                   type="submit"
                   className="w-full cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors"
+                  disabled={isSubmitting}
                >
                   Sign In
                </button>
 
                {/* Divider */}
-               <div className="relative my-6">
+               <div className="relative my-6 hidden">
                   <div className="absolute inset-0 flex items-center">
                      <div className="w-full border-t border-gray-600"></div>
                   </div>
-                  <div className="relative flex justify-center text-sm">
+                  <div className="  relative flex justify-center text-sm">
                      <span className="px-2 bg-gray-950 text-gray-200">
                         Or continue with
                      </span>
                   </div>
                </div>
 
-               {/* Social Login Buttons */}
-               <div className="grid grid-cols-1 place-items-center">
+               {/* Social Login */}
+               <div className="grid grid-cols-1 place-items-center hidden">
                   <button
                      type="button"
-                     className=" w-[80%] flex items-center justify-center px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors gap-3 "
+                     className="w-[80%] flex items-center justify-center px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors gap-3 "
                   >
-                     <span className="text-2xl"><FcGoogle /></span>
+                     <span className="text-2xl">
+                        <FcGoogle />
+                     </span>
                      <span className="text-xl text-white font-semibold">Google</span>
                   </button>
-
                </div>
             </form>
 
@@ -127,7 +189,9 @@ function Login() {
                   Don&apos;t have an account?{" "}
                   <button
                      className="text-blue-500 underline hover:text-blue-600 font-medium cursor-pointer"
-                     onClick={()=>{nevigate("/register")}}
+                     onClick={() => {
+                        navigate("/register");
+                     }}
                   >
                      Sign up
                   </button>

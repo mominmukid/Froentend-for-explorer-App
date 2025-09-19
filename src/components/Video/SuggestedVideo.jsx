@@ -1,20 +1,32 @@
-import React from 'react'
-import { NavLink } from 'react-router'
+import React from "react";
+import { NavLink } from "react-router";
+import timeAgo from "../../utils/uploadedTime";// your uploadedTime/timeAgo util
 
-function SuggestedVideo() {
+function SuggestedVideo({ video: { _id, title, thumbnail, views, createdAt } }) {
+   const uploadedBefore = timeAgo(createdAt);
+
    return (
-      <NavLink to="/video">
-      <div className="flex gap-3 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 p-2 rounded-lg mb-4">
-         <div className="w-40 aspect-video bg-black rounded-lg"></div>
-         <div>
-            <h3 className="text-sm font-semibold">Video 1 Title</h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-               200k views • 2 days ago
-            </p>
+      <NavLink to={`/video/${_id}`} state={{ _id }}    onClick={() => window.scrollTo(0, 0)}>
+         <div className="flex gap-3 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 p-2 rounded-lg mb-4">
+            {/* Thumbnail */}
+            <div className="w-40 aspect-video bg-black rounded-lg overflow-hidden">
+               <img
+                  src={thumbnail}
+                  alt={title}
+                  className="w-full h-full object-cover"
+               />
+            </div>
+
+            {/* Video Info */}
+            <div className="flex flex-col justify-between">
+               <h3 className="text-sm font-semibold line-clamp-2">{title}</h3>
+               <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {views} views • {uploadedBefore}
+               </p>
+            </div>
          </div>
-      </div>
       </NavLink>
-   )
+   );
 }
 
-export default SuggestedVideo
+export default SuggestedVideo;

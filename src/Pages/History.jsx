@@ -6,7 +6,7 @@ function History() {
   return (
     <>
 
-      <main className="flex-1 px-8 mt-0  pt-20 min-h-screen " >
+      <main className="flex-1 px-auto mt-0  pt-20 min-h-screen " >
         {/* <!-- Header --> */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2" >Watch History</h1>
@@ -38,7 +38,7 @@ function History() {
 
 
            
-            <div className="space-y-4 flex-1 justify-center items-center gap-5 " >
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 w-full " >
               <HistoryVideo />
               <HistoryVideo />
               <HistoryVideo />

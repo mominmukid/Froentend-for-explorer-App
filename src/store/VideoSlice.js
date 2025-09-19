@@ -10,11 +10,9 @@ export const videoslice = createSlice({
   reducers: {
     toggleIsvisibalfalse: (state) => {
       state.isvisibal = false;
-      console.log(state.isvisibal);
     },
     toggleIsvisibalTrue: (state) => {
       state.isvisibal = true;
-      console.log(state.isvisibal);
     },
   },
 });

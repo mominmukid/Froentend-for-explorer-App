@@ -5,6 +5,7 @@ function Upload() {
    const [thumbnail, setThumbnail] = useState(null);
    const [title, setTitle] = useState("");
    const [description, setDescription] = useState("");
+   const [category, setCategory] = useState("");
 
    const handleVideoChange = (e) => {
       setVideoFile(e.target.files[0]);
@@ -20,7 +21,7 @@ function Upload() {
          alert("Please select a video file to upload!");
          return;
       }
-      alert("Upload functionality will be implemented here!");
+      alert(`Uploading "${title}" in category "${category}"`);
    };
 
    return (
@@ -110,6 +111,54 @@ function Upload() {
                      className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-gray-400 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                      placeholder="Add video description, hashtags, links..."
                   ></textarea>
+               </div>
+
+               {/* Category */}
+               <div>
+                  <label className="block text-sm font-medium mb-2">
+                     Category
+                  </label>
+                  <select
+                     value={category}
+                     onChange={(e) => setCategory(e.target.value)}
+                     required
+                     className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-gray-400 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  >
+                     <option value="">Select a category</option>
+                     <option value="education">Education</option>
+                     <option value="entertainment">Entertainment</option>
+                     <option value="Music">Music</option>
+                     <option value="Gaming">Gaming</option>
+                     <option value="Science & Technology">Science & Technology</option>
+                     <option value="Sports">Sports</option>
+                     <option value="Vlogs">Vlogs</option>
+                     <option value="Comedy">Comedy</option>
+                     <option value="Lifestyle">Lifestyle</option>
+                     <option value="Movies">Movies</option>
+                     <option value="News">News</option>
+                     <option value="Travel">Travel</option>
+                     <option value="Food">Food</option>
+                     <option value="Health & Fitness">Health & Fitness</option>
+                     <option value="Fashion & Beauty">Fashion & Beauty</option>
+                     <option value="DIY & Crafts">DIY & Crafts</option>
+                     <option value="Automotive">Automotive</option>
+                     <option value="Animals & Pets">Animals & Pets</option>
+                     <option value="Business & Finance">Business & Finance</option>
+                     <option value="History">History</option>
+                     <option value="Art & Culture">Art & Culture</option>
+                     <option value="Politics">Politics</option>
+                     <option value="Environment">Environment</option>
+                     <option value="Religion & Spirituality">Religion & Spirituality</option>
+                     <option value="Parenting">Parenting</option>
+                     <option value="Real Estate">Real Estate</option>
+                     <option value="Photography">Photography</option>
+                     <option value="Books & Literature">Books & Literature</option>
+                     <option value="Theater">Theater</option>
+                     <option value="Animation">Animation</option>
+                     <option value="Documentary">Documentary</option>
+                     <option value="Short Films">Short Films</option>
+                     <option value="Others">Others</option>
+                  </select>
                </div>
 
                {/* Submit Button */}

@@ -15,7 +15,11 @@ import Register from './Register'
 import Upload from './Upload'
 import UserSetting from './UserSetting'
 import Videoupdate from './Videoupdate'
-
+import PlaylistCreate from './PlaylistCreate'
+import PlaylistDetailsPage from './Showplaylist'
+import Loder from './Loader'
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 function Layout() {
    const toggle = useSelector(state => state.video.isvisibal);
@@ -28,13 +32,14 @@ function Layout() {
 
          {/* Sidebar */}
          <SideBox />
+          <ToastContainer />
          {/* Main Content */}
          <div className={`ml-0 mt-13 p-4 dark:bg-[#202222] dark:text-white bg-[#f8f9fc]   hide-scrollbar ${toggle ? "md:ml-[240px]" : "md:ml-0"}`}>
             <Routes>
                <Route path='/' element={<Home />} />
                <Route path='/history' element={<History />} />
                <Route path='/like' element={<LikeVideo />} />
-               <Route path='/video' element={<VideoPage />} />
+               <Route path='/video/:id' element={<VideoPage />} />
                <Route path='/subscription' element={<Subscription />} />
                <Route path='/playlist' element={<Playlist />} />
                <Route path='/dashboard' element={<Dashboard />} />
@@ -43,7 +48,11 @@ function Layout() {
                <Route path='/upload' element={<Upload />} />
                <Route path='/video/update' element={<Videoupdate />} />
                <Route path='/setting' element={<UserSetting />} />
+               <Route path='/playlist/create' element={<PlaylistCreate />} />
+               <Route path='/playlist/show' element={<PlaylistDetailsPage />} />
+               <Route path='/loder' element={<Loder />} />
             </Routes>
+           
          </div>
       </div>
    )

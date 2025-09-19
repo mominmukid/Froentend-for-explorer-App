@@ -1,8 +1,12 @@
 import React from 'react'
+import { useNavigate } from 'react-router'
 
 function PlaylistVideo() {
+  const navigate = useNavigate();
   return (
-    <div className="bg-gray-200 dark:bg-gray-800 rounded-lg overflow-hidden hover:bg-gray-750 transition-colors cursor-pointer">
+    <div className="bg-gray-200 dark:bg-gray-800 rounded-lg overflow-hidden hover:bg-gray-750 transition-colors cursor-pointer" onClick={() => {
+      navigate('/playlist/show');
+    }}>
       <div className="relative">
         <img src="https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=300&h=200&fit=crop" alt="Playlist thumbnail" className="w-full h-40 object-cover" />
         <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">

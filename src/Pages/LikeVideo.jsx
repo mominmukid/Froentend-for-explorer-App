@@ -7,7 +7,7 @@ function LikeVideo() {
   {/* <!-- Main Content --> */}
   <div className="flex">
     {/* <!-- Main Content Area --> */}
-    <main className="flex-1 p-6 ml-0  pt-20" >
+    <main className="flex-1 p-auto ml-0  pt-20" >
       {/* <!-- Header --> */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2" >Liked Videos</h1>
@@ -24,7 +24,7 @@ function LikeVideo() {
       </div>
 
       {/* <!-- Video List --> */}
-      <div className="space-y-4" >
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 w-full" >
         <HistoryVideo/>
         <HistoryVideo/>
         <HistoryVideo/>

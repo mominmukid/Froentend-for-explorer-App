@@ -1,199 +1,245 @@
 import React, { useState } from "react";
 import { FaRegCirclePlay } from "react-icons/fa6";
 import { FcGoogle } from "react-icons/fc";
-import { useNavigate } from "react-router";
 import { BsPersonCircle } from "react-icons/bs";
+import { useNavigate } from "react-router";
+import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+
+
 const Signup = () => {
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const nevigate = useNavigate()
+  const [avatarPreview, setAvatarPreview] = useState(null);
+  const [bannerPreview, setBannerPreview] = useState(null);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    clearErrors,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    mode: "onBlur",
+  });
 
-    if (password !== confirmPassword) {
-      alert("Passwords do not match!");
-      return;
+  const password = watch("password");
+
+  const onSubmit = (data) => {
+    toast.success("Signup successful (demo)", {
+      position: "top-right",
+      autoClose: 2000,
+      theme: "dark",
+    });
+    console.log("Form data:", data);
+  };
+
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setAvatarPreview(URL.createObjectURL(file));
+      setValue("avatar", e.target.files); // Update RHF value
+      clearErrors("avatar"); // Clear error immediately
     }
+  };
 
-    if (password.length < 8) {
-      alert("Password must be at least 8 characters long!");
-      return;
+  const handleBannerChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setBannerPreview(URL.createObjectURL(file));
+      setValue("banner", e.target.files); // Update RHF value
+      clearErrors("banner"); // Clear error immediately
     }
-
-    alert("Signup functionality would be implemented here");
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="w-full max-w-md mx-auto p-6">
+    <div className="min-h-screen flex items-center justify-center ">
+      <div className="w-full max-w-md mx-auto pt-10 rounded-lg ">
         {/* Logo */}
         <div className="text-center mb-8">
           <a href="/" className="inline-flex items-center gap-2 mb-4">
-            {/* Replace with your logo image if you have one */}
             <span className="rounded-full flex items-center justify-center text-red-500 text-2xl mt-2 ml-[-3rem] font-bold">
               <FaRegCirclePlay />
             </span>
-            <span className="text-2xl font-bold">TubeClone</span>
+            <span className="text-2xl font-bold text-white">TubeClone</span>
           </a>
-          <h1 className="text-3xl font-bold mb-2">Create account</h1>
-          <p className="text-gray-700 dark:text-gray-300">Join TubeClone today</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Create account</h1>
+          <p className="text-gray-300">Join TubeClone today</p>
         </div>
 
         {/* Signup Form */}
-        <form className="space-y-6" onSubmit={handleSubmit}>
+        <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
           {/* Full Name */}
           <div>
-            <label
-              htmlFor="fullName"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-            >
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               Full Name
             </label>
             <input
               type="text"
-              id="fullName"
-              name="fullName"
-              required
               placeholder="Enter your full name"
-              className="w-full px-4 py-3 bg-gray-100 shadow-md shadow-gray-600 dark:bg-gray-800 border border-gray-600 rounded-lg 
-              focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              className="w-full px-4 py-3 dark:bg-gray-800 bg-gray-100 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              {...register("fullName", { required: "Full name is required" })}
             />
+            {errors.fullName && (
+              <div className="text-red-500 text-sm mt-1">{errors.fullName.message}</div>
+            )}
+          </div>
+
+          {/* Username */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Username
+            </label>
+            <input
+              type="text"
+              placeholder="Choose a username"
+              className="w-full px-4 py-3 dark:bg-gray-800 bg-gray-100 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              {...register("username", { required: "Username is required" })}
+            />
+            {errors.username && (
+              <div className="text-red-500 text-sm mt-1">{errors.username.message}</div>
+            )}
           </div>
 
           {/* Email */}
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-            >
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               Email address
             </label>
             <input
               type="email"
-              id="email"
-              name="email"
-              required
               placeholder="Enter your email"
-              className="w-full px-4 py-3 dark:bg-gray-800 shadow-md shadow-gray-600bg-gray-100 border border-gray-600 rounded-lg 
-              focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              className="w-full px-4 py-3 dark:bg-gray-800 bg-gray-100 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              {...register("email", {
+                required: "Email is required",
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "Enter a valid email",
+                },
+              })}
             />
+            {errors.email && (
+              <div className="text-red-500 text-sm mt-1">{errors.email.message}</div>
+            )}
           </div>
 
           {/* Password */}
           <div>
-            <label
-              htmlFor="password"
-              className="block text-sm dark:text-gray-300 font-medium text-gray-300 mb-2"
-            >
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               Password
             </label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
-                id="password"
-                name="password"
-                required
                 placeholder="Create a password"
-                className="w-full px-4 py-3 dark:bg-gray-800 bg-gray-100 shadow-md shadow-gray-600 border border-gray-600 rounded-lg 
-                focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-12"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-3 dark:bg-gray-800 bg-gray-100 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-12"
+                {...register("password", {
+                  required: "Password is required",
+                  minLength: { value: 8, message: "Password must be at least 8 characters" },
+                })}
               />
               <button
                 type="button"
-                className="absolute right-4 top-3 text-sm  hover:text-gray-700 text-gray-800 cursor-pointer dark:text-gray-300  dark:hover:text-gray-200"
+                className="absolute right-4 top-3 text-gray-800 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? "Hide" : "Show"}
               </button>
             </div>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-              Must be at least 8 characters long
-            </p>
+            {errors.password && (
+              <div className="text-red-500 text-sm mt-1">{errors.password.message}</div>
+            )}
           </div>
 
           {/* Confirm Password */}
           <div>
-            <label
-              htmlFor="confirmPassword"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-            >
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               Confirm Password
             </label>
             <input
               type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              required
               placeholder="Confirm your password"
-              className="w-full px-4 py-3 dark:bg-gray-800 bg-gray-100 border border-gray-600 rounded-lg 
-              focus:outline-none shadow-md shadow-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full px-4 py-3 dark:bg-gray-800 bg-gray-100 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              {...register("confirmPassword", {
+                required: "Confirm password is required",
+                validate: (value) =>
+                  value === password || "Passwords do not match",
+              })}
             />
+            {errors.confirmPassword && (
+              <div className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</div>
+            )}
           </div>
+
+          {/* Avatar */}
           <div>
-            <label
-              htmlFor="avatar"
-              className="block text-sm font-medium text-gray-800 dark:text-gray-300 mb-2"
-            >
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               Avatar
             </label>
             <div className="relative">
               <input
                 type="file"
-                id="avatar"
-                name="avatar"
                 accept="image/*"
-                required
-                className="w-full px-4 py-3 dark:bg-gray-800 bg-gray-100 shadow-md shadow-gray-600 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pl-12 pr-12 cursor-pointer "
+                className="w-full px-4 py-3 dark:bg-gray-800 bg-gray-100 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pl-12 pr-12 cursor-pointer"
+                {...register("avatar", { required: "Avatar is required" })}
+                onChange={handleAvatarChange}
               />
-              <i className="w-5 h-5 text-gray-800 absolute left-4 top-4.5 text-xl"><BsPersonCircle/></i>
+              <i className="absolute left-4 top-3 text-xl text-gray-300">
+                <BsPersonCircle />
+              </i>
             </div>
+            {avatarPreview && (
+              <img
+                src={avatarPreview}
+                alt="Avatar Preview"
+                className="mt-2 w-20 h-20 rounded-full object-cover"
+              />
+            )}
+            {errors.avatar && (
+              <div className="text-red-500 text-sm mt-1">{errors.avatar.message}</div>
+            )}
           </div>
+
+          {/* Banner Image (Optional) */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Banner Image (Optional)
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              className="w-full px-4 py-3 dark:bg-gray-800 bg-gray-100 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 cursor-pointer"
+              {...register("banner")}
+              onChange={handleBannerChange}
+            />
+            {bannerPreview && (
+              <img
+                src={bannerPreview}
+                alt="Banner Preview"
+                className="mt-2 w-full h-32 rounded-lg object-cover"
+              />
+            )}
+          </div>
+
           {/* Submit */}
           <button
             type="submit"
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 cursor-pointer px-4 rounded-lg transition-colors"
+            disabled={isSubmitting}
           >
             Create Account
           </button>
-
-          {/* Divider */}
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-600"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gray-950 text-gray-300">
-                Or continue with
-              </span>
-            </div>
-          </div>
-
-          {/* Social signup */}
-          <div className="grid grid-cols-1 place-items-center">
-            <button
-              type="button"
-              className=" w-[80%] flex items-center justify-center px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors gap-3 "
-            >
-              <span className="text-2xl"><FcGoogle /></span>
-              <span className="text-xl text-white font-semibold">Google</span>
-            </button>
-
-          </div>
         </form>
 
         {/* Signin link */}
         <div className="text-center mt-6">
-          <p className="text-gray-700 dark:text-gray-300">
+          <p className="text-gray-300">
             Already have an account?{" "}
             <button
-
               className="text-blue-400 underline cursor-pointer hover:text-blue-300 font-medium"
-              onClick={() => { nevigate("/login") }}>
+              onClick={() => navigate("/login")}
+            >
               Sign in
             </button>
           </p>
