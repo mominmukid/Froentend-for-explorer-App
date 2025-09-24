@@ -31,8 +31,8 @@ function Login() {
             localStorage.setItem("user", JSON.stringify(loggedInUser.user));
 
             // ✅ Save tokens in cookies
-            document.cookie = `accessToken=${loggedInUser.accessToken}; path=/; secure; samesite=None; max-age=86400`; // 1 day
-            document.cookie = `refreshToken=${loggedInUser.refreshToken}; path=/; secure; samesite=None; max-age=${60 * 60 * 24 * 7}`; // 7 days
+            document.cookie = `accessToken=${loggedInUser.accessToken}; path=/; samesite=None; max-age=86400`; // 1 day
+            document.cookie = `refreshToken=${loggedInUser.refreshToken}; path=/; samesite=None; max-age=${60 * 60 * 24 * 7}`; // 7 days
 
 
             toast.success("Login successful", {
