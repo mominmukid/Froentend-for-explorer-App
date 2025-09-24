@@ -31,8 +31,9 @@ function Login() {
             localStorage.setItem("user", JSON.stringify(loggedInUser.user));
 
             // ✅ Save tokens in cookies
-            document.cookie = `accessToken=${loggedInUser.accessToken}; path=/; secure; samesite=strict; max-age=86400`; // 1 day
-            document.cookie = `refreshToken=${loggedInUser.refreshToken}; path=/; secure; samesite=strict; max-age=${60 * 60 * 24 * 7}`; // 7 days
+            document.cookie = `accessToken=${loggedInUser.accessToken}; path=/; secure; samesite=None; max-age=86400`; // 1 day
+            document.cookie = `refreshToken=${loggedInUser.refreshToken}; path=/; secure; samesite=None; max-age=${60 * 60 * 24 * 7}`; // 7 days
+
 
             toast.success("Login successful", {
                position: "top-right",
@@ -133,7 +134,7 @@ function Login() {
                            maxLength: { value: 20, message: "Max length is 20" },
                         })}
                      />
-                    
+
                      <button
                         type="button"
                         onClick={() => setPasswordVisible(!passwordVisible)}
