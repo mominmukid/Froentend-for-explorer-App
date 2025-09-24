@@ -1,132 +1,123 @@
 import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router";
+import { uploadVideo } from "../store/VideoFeatureSlice";
+import { toast } from "react-toastify";
 
-function Upload() {
-   const [videoFile, setVideoFile] = useState(null);
-   const [thumbnail, setThumbnail] = useState(null);
-   const [title, setTitle] = useState("");
-   const [description, setDescription] = useState("");
-   const [category, setCategory] = useState("");
+const UploadPage = () => {
+   const { register, handleSubmit, formState: { errors } } = useForm({ mode: "onBlur" });
+   const [videoPreview, setVideoPreview] = useState(null);
+   const [thumbnailPreview, setThumbnailPreview] = useState(null);
+   const [isUploading, setIsUploading] = useState(false);
+   const dispatch = useDispatch();
+   const navigate = useNavigate();
 
-   const handleVideoChange = (e) => {
-      setVideoFile(e.target.files[0]);
-   };
+   const onSubmit = async (data) => {
+      setIsUploading(true); // ✅ start uploading state
+      alert(`Uploading Video: ${data.title}\nCategory: ${data.category}`);
 
-   const handleThumbnailChange = (e) => {
-      setThumbnail(e.target.files[0]);
-   };
+      try {
+         const resultAction = await dispatch(uploadVideo(data));
 
-   const handleSubmit = (e) => {
-      e.preventDefault();
-      if (!videoFile) {
-         alert("Please select a video file to upload!");
-         return;
+         if (uploadVideo.fulfilled.match(resultAction)) {
+            toast.success("Video Upload successful", {
+               position: "top-right",
+               autoClose: 500,
+               theme: "dark",
+            });
+            navigate("/");
+            // window.location.reload();
+         } else {
+            throw new Error("Upload failed");
+         }
+      } catch (e) {
+         toast.error("Video upload failed. Please try again.", {
+            position: "top-right",
+            autoClose: 2000,
+            theme: "dark",
+         });
+         navigate("/upload");
+         console.error(e.message);
+      } finally {
+         setIsUploading(false); // ✅ stop uploading state
       }
-      alert(`Uploading "${title}" in category "${category}"`);
    };
 
    return (
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-white flex items-center justify-center p-6">
-         <div className="w-full max-w-3xl bg-white dark:bg-gray-900 shadow-lg rounded-2xl p-8">
+      <div className="min-h-screen flex items-center justify-center p-4">
+         <div className="w-full max-w-3xl bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 sm:p-10">
+            <h1 className="text-3xl font-bold text-center mb-6 text-gray-700 dark:text-gray-300">Upload Your Video</h1>
 
-            {/* Header */}
-            <h1 className="text-2xl font-bold mb-6 text-center">
-               🎬 Upload Your Video
-            </h1>
+            <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
 
-            {/* Form */}
-            <form className="space-y-6" onSubmit={handleSubmit}>
-
-               {/* Video Upload */}
+               {/* Video File */}
                <div>
-                  <label className="block text-sm font-medium mb-2">
-                     Select Video
-                  </label>
-                  <div className="border-2 border-dashed border-gray-400 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500">
-                     <input
-                        type="file"
-                        accept="video/*"
-                        onChange={handleVideoChange}
-                        className="hidden"
-                        id="video-upload"
-                     />
-                     <label htmlFor="video-upload" className="cursor-pointer text-center">
-                        {videoFile ? (
-                           <p className="text-green-500 font-medium">{videoFile.name}</p>
-                        ) : (
-                           <p className="text-gray-500">
-                              Click to select video file or drag & drop
-                           </p>
-                        )}
-                     </label>
-                  </div>
+                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Video File</label>
+                  <input
+                     type="file"
+                     accept="video/*"
+                     {...register("videoFile", { required: "Video file is required" })}
+                     onChange={(e) => e.target.files[0] && setVideoPreview(URL.createObjectURL(e.target.files[0]))}
+                     className="w-full cursor-pointer px-4 py-2 border rounded-lg border-gray-400 dark:border-gray-600 dark:bg-gray-800 bg-gray-100"
+                     disabled={isUploading}
+                  />
+                  {videoPreview && <video src={videoPreview} controls className="mt-2 w-full rounded-lg" />}
+                  {errors.videoFile && <p className="text-red-500 text-sm mt-1">{errors.videoFile.message}</p>}
                </div>
 
-               {/* Thumbnail Upload */}
+               {/* Thumbnail */}
                <div>
-                  <label className="block text-sm font-medium mb-2">
-                     Upload Thumbnail (optional)
-                  </label>
+                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Thumbnail</label>
                   <input
                      type="file"
                      accept="image/*"
-                     onChange={handleThumbnailChange}
-                     className="block w-full text-sm text-gray-500 
-                         file:mr-4 file:py-2 file:px-4
-                         file:rounded-lg file:border-0
-                         file:text-sm file:font-semibold
-                         file:bg-blue-600 file:text-white
-                         hover:file:bg-blue-700 cursor-pointer"
+                     {...register("thumbnail", { required: "Thumbnail is required" })}
+                     onChange={(e) => e.target.files[0] && setThumbnailPreview(URL.createObjectURL(e.target.files[0]))}
+                     className="w-full cursor-pointer px-4 py-2 border rounded-lg border-gray-400 dark:border-gray-600 dark:bg-gray-800 bg-gray-100"
+                     disabled={isUploading}
                   />
-                  {thumbnail && (
-                     <p className="mt-2 text-green-500 font-medium">
-                        {thumbnail.name}
-                     </p>
-                  )}
+                  {thumbnailPreview && <img src={thumbnailPreview} alt="Thumbnail Preview" className="mt-2 w-48 h-28 object-cover rounded-lg" />}
+                  {errors.thumbnail && <p className="text-red-500 text-sm mt-1">{errors.thumbnail.message}</p>}
                </div>
 
                {/* Title */}
                <div>
-                  <label className="block text-sm font-medium mb-2">
-                     Video Title
-                  </label>
+                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Title</label>
                   <input
                      type="text"
-                     value={title}
-                     onChange={(e) => setTitle(e.target.value)}
-                     required
-                     className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-gray-400 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                     placeholder="Enter your video title"
+                     placeholder="Enter video title"
+                     {...register("title", { required: "Title is required" })}
+                     className="w-full px-4 py-2 border rounded-lg border-gray-400 dark:border-gray-600 dark:bg-gray-800 bg-gray-100"
+                     disabled={isUploading}
                   />
+                  {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
                </div>
 
                {/* Description */}
                <div>
-                  <label className="block text-sm font-medium mb-2">
-                     Description
-                  </label>
+                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Description</label>
                   <textarea
-                     value={description}
-                     onChange={(e) => setDescription(e.target.value)}
                      rows="4"
-                     className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-gray-400 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                     placeholder="Add video description, hashtags, links..."
-                  ></textarea>
+                     placeholder="Add description"
+                     {...register("description", { required: "Description is required" })}
+                     className="w-full px-4 py-2 border rounded-lg border-gray-400 dark:border-gray-600 dark:bg-gray-800 bg-gray-100"
+                     disabled={isUploading}
+                  />
+                  {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
                </div>
 
                {/* Category */}
                <div>
-                  <label className="block text-sm font-medium mb-2">
-                     Category
-                  </label>
+                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Category</label>
                   <select
-                     value={category}
-                     onChange={(e) => setCategory(e.target.value)}
-                     required
+                     {...register("category", { required: "Please select a category" })}
                      className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-gray-400 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                     disabled={isUploading}
                   >
                      <option value="">Select a category</option>
-                     <option value="education">Education</option>
-                     <option value="entertainment">Entertainment</option>
+                     <option value="Education">Education</option>
+                     <option value="Entertainment">Entertainment</option>
                      <option value="Music">Music</option>
                      <option value="Gaming">Gaming</option>
                      <option value="Science & Technology">Science & Technology</option>
@@ -159,21 +150,26 @@ function Upload() {
                      <option value="Short Films">Short Films</option>
                      <option value="Others">Others</option>
                   </select>
+                  {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category.message}</p>}
                </div>
 
+               {/* Uploading Indicator */}
+               {isUploading && (
+                  <div className="text-center text-blue-600 font-medium">Uploading...</div>
+               )}
+
                {/* Submit Button */}
-               <div className="flex justify-center">
-                  <button
-                     type="submit"
-                     className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg shadow-md hover:bg-blue-700 transition cursor-pointer"
-                  >
-                     Upload Video
-                  </button>
-               </div>
+               <button
+                  type="submit"
+                  className={`w-full py-3 text-white font-medium rounded-lg transition-colors ${isUploading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+                  disabled={isUploading} // ✅ disable while uploading
+               >
+                  {isUploading ? "Uploading..." : "Upload Video"}
+               </button>
             </form>
          </div>
       </div>
    );
-}
+};
 
-export default Upload;
+export default UploadPage;

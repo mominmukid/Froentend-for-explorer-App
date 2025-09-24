@@ -1,61 +1,75 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import SubcriptionModel from '../components/subscription/SubcriptionModel'
 import Subscribs from '../components/subscription/Subscribs'
+import { getUserSubscribers } from '../store/subscriptionSlice'
+import { useDispatch } from 'react-redux'
+import Loader from '../Pages/Loader'  // ✅ your loader component
+
 function Subscription() {
+  const [subscribes, setSubscribes] = useState([]);
+  const [loading, setLoading] = useState(true); // ✅ loader state
+  const user = localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user"))
+    : null;
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    const fetchUserSubscribrs = async (id) => {
+      try {
+        setLoading(true);
+        const resultAction = await dispatch(getUserSubscribers(id))
+        if (getUserSubscribers.fulfilled.match(resultAction)) {
+          const subscribedChannels = resultAction.payload;
+          setSubscribes(subscribedChannels || []);
+        }
+      } catch (error) {
+        console.error("Error fetching subscriptions:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    if (user?._id) {
+      fetchUserSubscribrs(user._id)
+    }
+  }, [dispatch, user?._id])
+
   return (
     <div className="flex">
-      <main className="flex-1 p-6 ml-0  pt-20">
+      <main className="flex-1 p-6 ml-0 pt-20">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Subscriptions</h1>
-          <p className="text-gray-700 dark:text-gray-300">Latest videos from channels you follow</p>
+          <h1 className="text-3xl font-bold mb-2">Subscriptions ({subscribes.length}) </h1>
+          <p className="text-gray-700 dark:text-gray-300">
+            Latest videos from channels you follow ! click to go
+          </p>
         </div>
 
-        {/* Filter Tabs */}
-        <div className="mb-6 border-b border-gray-800 pb-1">
-          <nav className="flex gap-8">
-            <button className="pb-1 border-b-2 border-blue-500 text-blue-500 font-medium cursor-pointer">Latest</button>
-            <button className="pb-1 text-gray-700 dark:text-gray-300 hover:text-blue-500 font-medium cursor-pointer">Channels</button>
-          </nav>
-        </div>
-
-        {/* Latest Videos Tab Content */}
-        <div className="space-y-6">
-          {/* Channel Section 1 */}
-          <div>
-
+        {/* Content */}
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <Loader />
           </div>
+        ) : (
+          <>
+            {/* Example Latest Videos Section */}
+            
 
-
-          <div>
-
-
-            {/* Videos */}
-            <div className="">
-              <div className="  flex-1 gap-5 justify-center">
-                <div className='mb-5'> <SubcriptionModel /></div>
-                <div className='mb-5'> <SubcriptionModel /></div>
-                <div className='mb-5'> <SubcriptionModel /></div>
-
-                <div>
+            {/* Channels Tab Content */}
+            <div className="block mt-10">
+              {subscribes.length === 0 ? (
+                <p className="text-gray-500 dark:text-gray-400">No subscriptions yet.</p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {subscribes.map((video) => (
+                    <Subscribs key={video._id} video={video} userId={user?._id}/>
+                  ))}
                 </div>
-              </div>
+              )}
             </div>
-          </div>
-        </div>
-
-        {/* Channels Tab Content */}
-        <div className="block">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-           <Subscribs/>
-           <Subscribs/>
-           <Subscribs/>
-           
-          </div>
-        </div>
+          </>
+        )}
       </main>
     </div>
-
   )
 }
 

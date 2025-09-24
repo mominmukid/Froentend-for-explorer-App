@@ -1,108 +1,172 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { getUser, updateUserAvatar, updateUserBanner, updateUserFullname } from "../store/UserSlice";
 
 function SettingsPage() {
+  const reduxUser = useSelector(getUser);
+  const [localUser, setLocalUser] = useState(null);
+  const dispatch = useDispatch();
+
   const [banner, setBanner] = useState("https://source.unsplash.com/random/1600x400/?nature");
   const [avatar, setAvatar] = useState("https://i.pravatar.cc/150?img=5");
   const [fullname, setFullname] = useState("John Doe");
 
-  // Handle Banner Upload
-  const handleBannerChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setBanner(URL.createObjectURL(file));
+  const [bannerFile, setBannerFile] = useState(null);
+  const [avatarFile, setAvatarFile] = useState(null);
+
+  // Load user from localStorage on mount
+  useEffect(() => {
+    const userData = localStorage.getItem("user");
+    if (userData) setLocalUser(JSON.parse(userData));
+  }, []);
+
+  const user = reduxUser?.user || localUser;
+
+  // Populate form fields when user data is ready
+  useEffect(() => {
+    if (!user) return;
+    if (user.avatar) setAvatar(user.avatar);
+    if (user.fullname) setFullname(user.fullname);
+    if (user.coverImage) setBanner(user.coverImage);
+  }, [user]);
+
+  // Handle Avatar Update
+  const handleAvatarUpdate = async () => {
+    if (!avatarFile) return alert("Please select a new avatar first!");
+    const confirmed = window.confirm("Are you sure you want to update your avatar?");
+    if (!confirmed) return;
+
+    try {
+      const resultAction = await dispatch(updateUserAvatar(avatarFile));
+
+      if (updateUserAvatar.fulfilled.match(resultAction)) {
+        const updatedUser = resultAction.payload; // <- this is the updated user object
+        localStorage.setItem("user", JSON.stringify(updatedUser)); // save updated user
+        window.location.reload();
+      } else {
+        throw new Error("Update action was not fulfilled");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Failed to update avatar. Try again."); // failure alert
     }
   };
 
-  // Handle Avatar Upload
-  const handleAvatarChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setAvatar(URL.createObjectURL(file));
+  const handleBannerUpdate = async () => {
+    if (!bannerFile) return alert("Please select a new Banner first!");
+    const confirmed = window.confirm("Are you sure you want to update your Banner?");
+    if (!confirmed) return;
+
+    try {
+      const resultAction = await dispatch(updateUserBanner(bannerFile));
+
+      if (updateUserBanner.fulfilled.match(resultAction)) {
+        const updatedUser = resultAction.payload; // <- this is the updated user object
+        localStorage.setItem("user", JSON.stringify(updatedUser)); // save updated user
+        window.location.reload();
+      } else {
+        throw new Error("Update action was not fulfilled");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Failed to update Banner. Try again."); // failure alert
     }
   };
 
-  // Handle Save Changes
-  const handleSave = () => {
-    alert(`Profile Updated!\nName: ${fullname}`);
-    // here you can call your API to save user data
+
+  // Handle Fullname Update
+  const handleFullnameUpdate = async () => {
+    if (!fullname.trim()) return alert("Fullname cannot be empty!");
+    const confirmed = window.confirm("Are you sure you want to update your fullname?");
+    if (!confirmed) return;
+
+    try {
+      const resultAction = await dispatch(updateUserFullname(fullname.trim()));
+
+      if (updateUserFullname.fulfilled.match(resultAction)) {
+        const updatedUser = resultAction.payload; // <- this is the updated user object
+        localStorage.setItem("user", JSON.stringify(updatedUser)); // save updated user
+        window.location.reload();
+      } else {
+        throw new Error("Update action was not fulfilled");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Failed to update fullname. Try again."); // failure alert
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-200 p-4 sm:p-8">
-      <div className="max-w-4xl mx-auto bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 sm:p-10">
+    <div className="min-h-screen   text-gray-900 dark:text-gray-200 p-4 sm:p-8">
+      <div className="max-w-4xl mx-auto rounded-xl shadow-lg p-6 sm:p-10 ">
         <h1 className="text-2xl font-bold mb-6">Profile Settings</h1>
 
         {/* Banner Upload */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Banner Image | click to change
-          </label>
+          <label className="block text-sm font-medium mb-2">Banner Image</label>
           <div className="relative w-full h-48 md:h-60 bg-gray-200 rounded-lg overflow-hidden">
-            <img
-              src={banner}
-              alt=""
-              className="w-full h-full object-cover bg-gradient-to-r from-blue-500 to-purple-600"
-            />
+            <img src={banner} alt="Banner" className="w-full h-full object-cover" />
             <input
               type="file"
               accept="image/*"
-              onChange={handleBannerChange}
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                setBanner(URL.createObjectURL(file));
+                setBannerFile(file); // store actual File for backend
+              }}
               className="absolute inset-0 opacity-0 cursor-pointer"
             />
           </div>
+          <button
+            onClick={handleBannerUpdate}
+            className="mt-2 px-4 py-1 bg-blue-600 cursor-pointer text-white rounded-lg hover:bg-blue-700"
+          >
+            Update Banner
+          </button>
         </div>
 
         {/* Avatar Upload */}
-        <div className="mb-6 flex items-center gap-4">
+        <div className="mb-6 flex-1 items-center gap-4">
           <div className="relative">
-            <img
-              src={avatar}
-              alt="Avatar Preview"
-              className="w-24 h-24 rounded-full border-4 border-white dark:border-gray-800 shadow-md object-cover"
-            />
+            <img src={avatar} alt="Avatar" className="w-24 h-24 rounded-full border-4 border-white dark:border-gray-800 shadow-md object-cover" />
             <input
               type="file"
               accept="image/*"
-              onChange={handleAvatarChange}
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                setAvatar(URL.createObjectURL(file));
+                setAvatarFile(file); // store actual File for backend
+              }}
               className="absolute inset-0 opacity-0 cursor-pointer rounded-full"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Profile Picture
-            </label>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              Click the image to change avatar
-            </p>
-          </div>
+          <button
+            onClick={handleAvatarUpdate}
+            className="px-4 py-1 bg-blue-600 cursor-pointer text-white rounded-lg hover:bg-blue-700"
+          >
+            Update Avatar
+          </button>
         </div>
 
         {/* Full Name */}
         <div className="mb-6">
-          <label
-            htmlFor="fullname"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
-            Full Name
-          </label>
-          <input
-            type="text"
-            id="fullname"
-            value={fullname}
-            onChange={(e) => setFullname(e.target.value)}
-            placeholder="Enter your full name"
-            className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-700 shadow-sm px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800"
-          />
-        </div>
-
-        {/* Save Button */}
-        <div className="flex justify-end">
-          <button
-            onClick={handleSave}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md transition"
-          >
-            Save Changes
-          </button>
+          <label className="block text-sm font-medium mb-2">Full Name</label>
+          <div className="flex flex-wrap gap-2">
+            <input
+              type="text"
+              value={fullname}
+              onChange={(e) => setFullname(e.target.value)}
+              className="flex-1 rounded-lg border border-gray-300 dark:border-gray-700 shadow-sm px-4 py-2 dark:bg-gray-800"
+            />
+            <button
+              onClick={handleFullnameUpdate}
+              className="px-4 py-1 cursor-pointer bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              Update Name
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 export default function timeAgo(dateString) {
-  let num=dateString.toString();
-  const updated = new Date(num).getTime();
+ 
+  const updated = new Date(dateString).getTime();
   const now = new Date().getTime();
   let diff = Math.floor((now - updated) / 1000); // difference in seconds
 

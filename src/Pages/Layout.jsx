@@ -20,6 +20,7 @@ import PlaylistDetailsPage from './Showplaylist'
 import Loder from './Loader'
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import SubscriptionVideoPage from '../Pages/SubscriptionVideoPage'
 
 function Layout() {
    const toggle = useSelector(state => state.video.isvisibal);
@@ -46,11 +47,12 @@ function Layout() {
                <Route path='/login' element={<Login />} />
                <Route path='/register' element={<Register />} />
                <Route path='/upload' element={<Upload />} />
-               <Route path='/video/update' element={<Videoupdate />} />
+               <Route path='/video/update/:id' element={<Videoupdate />} />
                <Route path='/setting' element={<UserSetting />} />
                <Route path='/playlist/create' element={<PlaylistCreate />} />
                <Route path='/playlist/show' element={<PlaylistDetailsPage />} />
                <Route path='/loder' element={<Loder />} />
+               <Route path='/subscription/video/:id' element={<SubscriptionVideoPage />} />
             </Routes>
            
          </div>

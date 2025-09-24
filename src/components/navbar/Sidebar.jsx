@@ -1,36 +1,72 @@
-import React from 'react'
-import { Link, NavLink } from 'react-router-dom'
-import { RxCross1 } from "react-icons/rx";
+import React from "react";
+import { NavLink } from "react-router-dom";
 import { IoMdHome } from "react-icons/io";
 import { MdOutlinePlaylistPlay } from "react-icons/md";
 import { FaHistory } from "react-icons/fa";
 import { AiOutlineLike } from "react-icons/ai";
 import { MdSubscriptions } from "react-icons/md";
 
-function Sidebar({
-   cancle,
-   setcancle,
-}) {
+function Sidebar({ cancle, setcancle }) {
+  return (
+    <>
+      {/* Overlay (click anywhere outside to close) */}
+      {!cancle && (
+        <div
+          className="fixed inset-0 bg-black/40 md:hidden z-40"
+          onClick={() => setcancle(true)}
+        ></div>
+      )}
 
-   return (
-      <>
-         <div className={`${cancle ? 'hidden' : 'block'} md:hidden fixed top-0 left-0 h-screen w-[60%] sm:w-[25%] bg-white/90 flex flex-col justify-start pt-12   gap-5 items-center1 border-r-2 border-gray-400 dark:bg-[#202222]`}>
-            {/* for home for mobile screen */}
-            <NavLink to="/" className='w-full hover:bg-gray-300  cursor-pointer rounded-full flex justify-start pl-5  gap-2 p-2 transition  duration-100 ease-in-out dark:text-white dark:hover:bg-gray-800' onClick={() => { setcancle(true) }}><span className='flex justify-center items-center text-xl '><IoMdHome /> </span> <span className='font-bold '>Home</span></NavLink>
+      {/* Sidebar */}
+      <div
+        className={`${
+          cancle ? "-translate-x-full" : "translate-x-0"
+        } md:hidden fixed top-0 left-0 h-screen w-[60%] sm:w-[40%] bg-white dark:bg-[#202222] border-r-2 border-gray-300 dark:border-gray-800 shadow-lg z-50 transition-transform duration-300 ease-in-out`}
+      >
+        <nav className="flex flex-col gap-2 mt-12">
+          <NavLink
+            to="/"
+            className="w-full flex items-center gap-2 px-5 py-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-800 dark:text-white font-medium"
+            onClick={() => setcancle(true)}
+          >
+            <IoMdHome className="text-xl" /> Home
+          </NavLink>
 
-            {/* for playlist for mobile screen */}
-            <NavLink to="/playlist" className='w-full hover:bg-gray-300  cursor-pointer rounded-full flex justify-start pl-5  gap-2 p-2 transition duration-200 ease-in-out dark:text-white dark:hover:bg-gray-800' onClick={() => { setcancle(true) }}><span className='flex justify-center items-center text-2xl'><MdOutlinePlaylistPlay /> </span> <span className='font-bold '>playlists</span></NavLink>
-            {/* for History for mobile screen */}
-            <NavLink to="/history" className='w-full hover:bg-gray-300  cursor-pointer rounded-full flex justify-start pl-5  gap-2 p-2 transition  duration-200 ease-in-out dark:text-white dark:hover:bg-gray-800' onClick={() => { setcancle(true) }}><span className='flex justify-center items-center text-xl'><FaHistory /> </span> <span className='font-bold '>History</span></NavLink>
-            {/* for Subscription for mobile screen */}
-            <NavLink to="/subscription" className='w-full hover:bg-gray-200  cursor-pointer rounded-full flex justify-start pl-5  gap-2 p-2 transition duration-300 ease-in-out dark:text-white dark:hover:bg-gray-800' onClick={() => { setcancle(true) }}><span className='flex justify-center items-center text-xl'>< MdSubscriptions /> </span> <span className='font-bold '>Subsciption</span></NavLink>
-            {/* for liked for mobile screen */}
-            <NavLink to="/like" className='w-full hover:bg-gray-200  cursor-pointer rounded-full flex justify-start pl-5  gap-2 p-2 transition duration-300 ease-in-out dark:text-white dark:hover:bg-gray-800' onClick={() => { setcancle(true) }}><span className='flex justify-center items-center text-xl'><AiOutlineLike /> </span> <span className='font-bold '>Liked</span></NavLink>
-            {/* Cancle button */}
+          <NavLink
+            to="/playlist"
+            className="w-full flex items-center gap-2 px-5 py-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-800 dark:text-white font-medium"
+            onClick={() => setcancle(true)}
+          >
+            <MdOutlinePlaylistPlay className="text-2xl" /> Playlists
+          </NavLink>
 
-         </div>
-      </>
-   )
+          <NavLink
+            to="/history"
+            className="w-full flex items-center gap-2 px-5 py-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-800 dark:text-white font-medium"
+            onClick={() => setcancle(true)}
+          >
+            <FaHistory className="text-lg" /> History
+          </NavLink>
+
+          <NavLink
+            to="/subscription"
+            className="w-full flex items-center gap-2 px-5 py-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-800 dark:text-white font-medium"
+            onClick={() => setcancle(true)}
+          >
+            <MdSubscriptions className="text-xl" /> Subscription
+          </NavLink>
+
+          <NavLink
+            to="/like"
+            className="w-full flex items-center gap-2 px-5 py-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-800 dark:text-white font-medium"
+            onClick={() => setcancle(true)}
+          >
+            <AiOutlineLike className="text-xl" /> Liked
+          </NavLink>
+        </nav>
+      </div>
+    </>
+  );
 }
 
-export default Sidebar
+export default Sidebar;

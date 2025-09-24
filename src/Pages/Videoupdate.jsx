@@ -1,19 +1,24 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router";
+import { useParams } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { updateVideo, updateThumnel, updateVideoDetails } from "../store/VideoFeatureSlice";
+import { toast } from "react-toastify";
 
 function VideoUpdatePage() {
-   const [thumbnail, setThumbnail] = useState("https://source.unsplash.com/random/400x225/?video");
+   const [thumbnail, setThumbnail] = useState(null);
    const [video, setVideo] = useState(null);
    const [title, setTitle] = useState("My Awesome Video");
    const [description, setDescription] = useState("This is the description of the video...");
 
-   // Handle Thumbnail Change
-   const handleThumbnailChange = (e) => {
-      const file = e.target.files[0];
-      if (file) {
-         setThumbnail(URL.createObjectURL(file));
-         setThumbnail(file); // save actual file for upload
-      }
-   };
+   // separate loading states
+   const [videoUploading, setVideoUploading] = useState(false);
+   const [thumbnailUploading, setThumbnailUploading] = useState(false);
+   const [detailsUpdating, setDetailsUpdating] = useState(false);
+
+   const navigate = useNavigate();
+   const dispatch = useDispatch();
+   const { id } = useParams();
 
    // Handle Video Upload
    const handleVideoChange = (e) => {
@@ -21,47 +26,108 @@ function VideoUpdatePage() {
       if (file) setVideo(file);
    };
 
+   const handleThumbnailChange = (e) => {
+      const file = e.target.files[0];
+      if (file) setThumbnail(file);
+   };
+
    // Upload Video Only
    const handleVideoUpload = async () => {
-      if (!video) return alert("Please select a video!");
-      const formData = new FormData();
-      formData.append("video", video);
+      if (!video) return alert("Please select a new Video first!");
+      const confirmed = window.confirm("Are you sure you want to update your Video?");
+      if (!confirmed) return;
 
-      await fetch("http://localhost:3000/api/v1/videos/update-video", {
-         method: "POST",
-         body: formData,
-      });
+      try {
+         setVideoUploading(true);
+         const resultAction = await dispatch(updateVideo({ id, video }));
 
-      alert("✅ Video updated successfully!");
+         if (updateVideo.fulfilled.match(resultAction)) {
+            toast.success("Video Updated successfully!", {
+               position: "top-right",
+               autoClose: 800,
+               theme: "dark",
+            });
+            navigate(`/video/${id}`);
+         } else {
+            throw new Error("Update action was not fulfilled");
+         }
+      } catch (error) {
+         console.error(error);
+         toast.error("Video update failed. Please try again.", {
+            position: "top-right",
+            autoClose: 2000,
+            theme: "dark",
+         });
+      } finally {
+         setVideoUploading(false);
+      }
    };
 
-   // Upload Thumbnail Only
    const handleThumbnailUpload = async () => {
-      if (!thumbnail || typeof thumbnail === "string") return alert("Please select a thumbnail!");
-      const formData = new FormData();
-      formData.append("thumbnail", thumbnail);
+      if (!thumbnail) return alert("Please select a new Thumbnail first!");
+      const confirmed = window.confirm("Are you sure you want to update your Thumbnail?");
+      if (!confirmed) return;
 
-      await fetch("http://localhost:3000/api/v1/videos/update-thumbnail", {
-         method: "POST",
-         body: formData,
-      });
+      try {
+         setThumbnailUploading(true);
+         const resultAction = await dispatch(updateThumnel({ id, thumbnail }));
 
-      alert("✅ Thumbnail updated successfully!");
+         if (updateThumnel.fulfilled.match(resultAction)) {
+            toast.success("Thumbnail Updated successfully!", {
+               position: "top-right",
+               autoClose: 800,
+               theme: "dark",
+            });
+            navigate(`/`);
+         } else {
+            throw new Error("Update action was not fulfilled");
+         }
+      } catch (error) {
+         console.error(error);
+         toast.error("Thumbnail update failed. Please try again.", {
+            position: "top-right",
+            autoClose: 2000,
+            theme: "dark",
+         });
+      } finally {
+         setThumbnailUploading(false);
+      }
    };
 
-   // Update Text Details Only
    const handleDetailsUpdate = async () => {
-      await fetch("http://localhost:3000/api/v1/videos/update-details", {
-         method: "POST",
-         headers: { "Content-Type": "application/json" },
-         body: JSON.stringify({ title, description }),
-      });
+      if (!title.trim() || !description.trim())
+         return alert("Please add a Title and Description first!");
+      const confirmed = window.confirm("Are you sure you want to update your Video Title and Description?");
+      if (!confirmed) return;
 
-      alert("✅ Details updated successfully!");
+      try {
+         setDetailsUpdating(true);
+         const resultAction = await dispatch(updateVideoDetails({ id, title, description }));
+
+         if (updateVideoDetails.fulfilled.match(resultAction)) {
+            toast.success("Title and Description Updated successfully!", {
+               position: "top-right",
+               autoClose: 800,
+               theme: "dark",
+            });
+            navigate(`/`);
+         } else {
+            throw new Error("Update action was not fulfilled");
+         }
+      } catch (error) {
+         console.error(error);
+         toast.error("Title/Description update failed. Please try again.", {
+            position: "top-right",
+            autoClose: 2000,
+            theme: "dark",
+         });
+      } finally {
+         setDetailsUpdating(false);
+      }
    };
-
+   
    return (
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-200 p-4 sm:p-8">
+      <div className="min-h-screen text-gray-900 dark:text-gray-200 p-4 sm:p-8">
          <div className="max-w-5xl mx-auto bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 sm:p-10">
             <h1 className="text-2xl font-bold mb-6">Update Video</h1>
 
@@ -90,21 +156,38 @@ function VideoUpdatePage() {
                      </div>
                      <button
                         onClick={handleVideoUpload}
-                        className="mt-2 w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition cursor-pointer"
+                        disabled={videoUploading}
+                        className={`mt-2 w-full px-4 py-2 rounded-lg text-white transition cursor-pointer ${videoUploading
+                           ? "bg-gray-400 cursor-not-allowed"
+                           : "bg-blue-600 hover:bg-blue-700"
+                           }`}
                      >
-                        Update Video
+                        {videoUploading ? "Uploading..." : "Update Video"}
                      </button>
+                     {videoUploading && (
+                        <div className="mt-2 text-sm text-blue-600">Video updating... please wait.</div>
+                     )}
                   </div>
 
                   {/* Thumbnail Upload */}
                   <div>
                      <label className="block text-sm font-medium mb-2">Thumbnail</label>
                      <div className="relative w-full aspect-video bg-gray-200 rounded-lg overflow-hidden">
-                        <img
-                           src={typeof thumbnail === "string" ? thumbnail : URL.createObjectURL(thumbnail)}
-                           alt="Thumbnail Preview"
-                           className="w-full h-full object-cover"
-                        />
+                        {thumbnail ? (
+                           <img
+                              src={
+                                 typeof thumbnail === "string"
+                                    ? thumbnail
+                                    : URL.createObjectURL(thumbnail)
+                              }
+                              alt="Thumbnail Preview"
+                              className="w-full h-full object-cover"
+                           />
+                        ) : (
+                           <span className="text-gray-500 flex items-center justify-center h-full">
+                              No thumbnail selected
+                           </span>
+                        )}
                         <input
                            type="file"
                            accept="image/*"
@@ -114,10 +197,17 @@ function VideoUpdatePage() {
                      </div>
                      <button
                         onClick={handleThumbnailUpload}
-                        className="mt-2 w-full px-4 py-2 bg-blue-600 cursor-pointer text-white rounded-lg hover:bg-blue-700  transition"
+                        disabled={thumbnailUploading}
+                        className={`mt-2 w-full px-4 py-2 rounded-lg text-white transition cursor-pointer ${thumbnailUploading
+                           ? "bg-gray-400 cursor-not-allowed"
+                           : "bg-blue-600 hover:bg-blue-700"
+                           }`}
                      >
-                        Update Thumbnail
+                        {thumbnailUploading ? "Uploading..." : "Update Thumbnail"}
                      </button>
+                     {thumbnailUploading && (
+                        <div className="mt-2 text-sm text-blue-600">Thumbnail updating... please wait.</div>
+                     )}
                   </div>
                </div>
 
@@ -152,13 +242,20 @@ function VideoUpdatePage() {
                   </div>
 
                   {/* Save Button */}
-                  <div className="flex justify-end">
+                  <div className="flex justify-end flex-col gap-2">
                      <button
                         onClick={handleDetailsUpdate}
-                        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md transition cursor-pointer"
+                        disabled={detailsUpdating}
+                        className={`px-6 py-2 rounded-lg text-white shadow-md transition cursor-pointer ${detailsUpdating
+                           ? "bg-gray-400 cursor-not-allowed"
+                           : "bg-blue-600 hover:bg-blue-700"
+                           }`}
                      >
-                        Update Details
+                        {detailsUpdating ? "Updating..." : "Update Details"}
                      </button>
+                     {detailsUpdating && (
+                        <div className="text-sm text-blue-600">Title & Description updating... please wait.</div>
+                     )}
                   </div>
                </div>
             </div>

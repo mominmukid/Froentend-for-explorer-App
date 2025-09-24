@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { FaRegCirclePlay } from "react-icons/fa6";
 import { FcGoogle } from "react-icons/fc";
-import { useNavigate } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { IoMdEyeOff } from "react-icons/io";
 import { IoEye } from "react-icons/io5";
-import { useDispatch, useSelector } from "react-redux";
-import { loginAsyncUser, getUser } from "../store/UserSlice";
+import { useDispatch, } from "react-redux";
+import { loginAsyncUser, } from "../store/UserSlice";
 function Login() {
    const {
       register,
@@ -20,29 +20,40 @@ function Login() {
    const navigate = useNavigate();
    const [passwordVisible, setPasswordVisible] = useState(false);
    const dispatch = useDispatch();
-   const user = useSelector(getUser);
    const onSubmit = async (formData) => {
-      await dispatch(loginAsyncUser(formData));
-        
-        
-      if (user) {
-         toast.success("Login page is under development", {
+      try {
+         const resultAction = await dispatch(loginAsyncUser(formData));
+
+         if (loginAsyncUser.fulfilled.match(resultAction)) {
+            const loggedInUser = resultAction.payload; // ✅ user + tokens from backend
+
+            // ✅ Save user object in localStorage
+            localStorage.setItem("user", JSON.stringify(loggedInUser.user));
+
+            // ✅ Save tokens in cookies
+            document.cookie = `accessToken=${loggedInUser.accessToken}; path=/; secure; samesite=strict; max-age=86400`; // 1 day
+            document.cookie = `refreshToken=${loggedInUser.refreshToken}; path=/; secure; samesite=strict; max-age=${60 * 60 * 24 * 7}`; // 7 days
+
+            toast.success("Login successful", {
+               position: "top-right",
+               autoClose: 500,
+               theme: "dark",
+            });
+
+            navigate("/");
+            window.location.reload();
+         } else {
+            throw new Error("Login failed");
+         }
+      } catch (e) {
+         toast.error("Login failed. Please try again.", {
             position: "top-right",
             autoClose: 2000,
             theme: "dark",
-         })
-         navigate("/");
-         return;
-      }else{
-            toast.error("Login failed. Please try again.", {
-               position: "top-right",
-               autoClose: 2000,
-               theme: "dark",
-            });
-            navigate("/login");
-            return;
-         }
-      
+         });
+         navigate("/login");
+         console.error(e.message);
+      }
    };
 
    return (
@@ -51,15 +62,15 @@ function Login() {
          <div className="w-full max-w-md mx-auto p-6 ">
             {/* Logo */}
             <div className="text-center mb-8">
-               <a
-                  href="/"
+               <NavLink
+                  to="/"
                   className="inline-flex justify-start items-center ml-[-2.5rem] gap-2 mb-4"
                >
                   <span className="text-red-500 text-2xl mt-1">
                      <FaRegCirclePlay />
                   </span>
                   <span className="text-2xl font-bold">TubeClone</span>
-               </a>
+               </NavLink>
                <h1 className="text-3xl font-bold mb-2">Welcome back</h1>
                <p className="text-gray-700 dark:text-gray-300">
                   Sign in to your account
@@ -92,10 +103,6 @@ function Login() {
                            },
                         })}
                      />
-                     <i
-                        className="w-5 h-5 text-gray-400 absolute left-4 top-3.5"
-                        data-lucide="mail"
-                     ></i>
                   </div>
                   {errors.email && (
                      <span className="text-red-500 text-sm m-1 block">
@@ -126,10 +133,7 @@ function Login() {
                            maxLength: { value: 20, message: "Max length is 20" },
                         })}
                      />
-                     <i
-                        className="w-5 h-5 text-gray-400 absolute left-4 top-3.5"
-                        data-lucide="lock"
-                     ></i>
+                    
                      <button
                         type="button"
                         onClick={() => setPasswordVisible(!passwordVisible)}

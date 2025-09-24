@@ -1,18 +1,28 @@
-import React from 'react'
-import { useState } from 'react';
+
+import { useEffect, useState } from 'react';
 import { FaRegCirclePlay } from "react-icons/fa6";
 import { NavLink } from 'react-router';
 import { PiListBold } from "react-icons/pi";
 import { IoMdSearch } from "react-icons/io";
 import { MdOutlineVideoCall } from "react-icons/md";
-import { CgProfile } from "react-icons/cg";
 import { GoSun } from "react-icons/go";
 import { IoMoon } from "react-icons/io5";
+import { useSelector } from 'react-redux';
+import { getUser } from '../../store/UserSlice';
 
+function Navitems({ handelList, handleIsBlock }) {
+   
+  const reduxUser = useSelector(getUser);
+const [localUser, setLocalUser] = useState(null);
 
-function Navitems({ handelList,  handleIsBlock }) {
-   cancelAnimationFrame
+useEffect(() => {
+  const userData = localStorage.getItem("user");
+  if (userData) {
+    setLocalUser(JSON.parse(userData));
+  }
+}, [reduxUser]); // 👈 rerun when reduxUser changes
 
+const user = reduxUser?.user || localUser;
    // ✅ Dark mode state
    const [isDark, setisDark] = useState(false);
 
@@ -66,8 +76,15 @@ function Navitems({ handelList,  handleIsBlock }) {
             </NavLink>
 
             {/* Profile button */}
-            <span className='text-[30px] dark:text-gray-100 lg:w-12 lg:h-12 w-fit h-fit rounded-full hover:bg-gray-200 hover:ring-primary-200 transition-all overflow-hidden flex justify-center items-center cursor-pointer dark:hover:bg-gray-800 text-gray-800' onClick={handleIsBlock}>
-               <CgProfile />
+            <span
+               className='text-[30px] dark:text-gray-100 lg:w-12 lg:h-12 w-fit h-fit rounded-full hover:bg-gray-200 hover:ring-primary-200 transition-all overflow-hidden flex justify-center items-center cursor-pointer dark:hover:bg-gray-800 text-gray-800'
+               onClick={handleIsBlock}
+            >
+               {user && user?.avatar ? (
+                  <img src={user?.avatar} alt="public/images/profile.png" className='w-10 h-10 object-cover' />
+               ) : (
+                  <img src="public/images/profile.png" alt="public/images/profile.png" className='w-10 h-10 object-cover' />
+               )}
             </span>
 
 

@@ -5,19 +5,20 @@ import { STATUS } from "../utils/status";
 
 // initial state
 const initialState = {
-  comments: [], // all comments for a video
-  commentsStatus: STATUS.IDLE, // status for fetching comments
-  addCommentStatus: STATUS.IDLE, // status for adding new comment
+  comments: [],
+  commentStatus: true,
 };
-
-// thunk to fetch comments for a video
 export const fetchAsyncComments = createAsyncThunk(
   "comments/fetch",
   async (videoId) => {
-    const response = await fetch(`${baseUrl}/comment/getallvideocomment/${videoId}`);
+    const response = await fetch(
+      `${baseUrl}/comment/getallvideocomment/${videoId}`,
+      {
+        method: "GET",
+        credentials: "include",
+      }
+    );
     const data = await response.json();
-    console.log(data);
-    
     return data.data; // should be an array of comments
   }
 );
@@ -25,27 +26,75 @@ export const fetchAsyncComments = createAsyncThunk(
 // thunk to add a new comment
 export const addAsyncComment = createAsyncThunk(
   "comments/add",
-  async ({ videoId, content }, { rejectWithValue }) => {
+  async ({ _id, newComment }, { rejectWithValue }) => {
+
     try {
-      const response = await fetch(
-        `${baseUrl}comment/createcomnent/${videoId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ content }),
-        }
-      );
+      const response = await fetch(`${baseUrl}/comment/createcomnent/${_id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ content: newComment }),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to add comment");
       }
+      
 
-      const data = await response.json();
-      return data; // the new comment object
+      return; // the new comment object
     } catch (error) {
       return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const updateComment = createAsyncThunk(
+  "comments/update",
+  async ({ _id, editedContent }, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${baseUrl}/comment/updatecomment/${_id}`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ content: editedContent }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to update comment");
+      }
+
+      const data = await response.json();
+      return data.data;
+    } catch (error) {
+      console.error("Update comment error:", error);
+      return rejectWithValue(error.message || "Something went wrong");
+    }
+  }
+);
+
+export const deleteComment = createAsyncThunk(
+  "comments/delete",
+  async (_id, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${baseUrl}/comment/deletecomment/${_id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to update comment");
+      }
+
+      return;
+    } catch (error) {
+      console.error("Update comment error:", error);
+      return rejectWithValue(error.message || "Something went wrong");
     }
   }
 );
@@ -56,35 +105,20 @@ const commentSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // fetch comments
-      .addCase(fetchAsyncComments.pending, (state) => {
-        state.commentsStatus = STATUS.LOADING;
-      })
       .addCase(fetchAsyncComments.fulfilled, (state, action) => {
         state.comments = action.payload;
-        state.commentsStatus = STATUS.SUCCEEDED;
       })
-      .addCase(fetchAsyncComments.rejected, (state) => {
-        state.commentsStatus = STATUS.FAILED;
+      .addCase(deleteComment.fulfilled, (state) => {
+        state.commentStatus = !state.commentStatus;
       })
-
-      // add comment
-      .addCase(addAsyncComment.pending, (state) => {
-        state.addCommentStatus = STATUS.LOADING;
-      })
-      .addCase(addAsyncComment.fulfilled, (state, action) => {
-        state.comments.push(action.payload); // append new comment
-        state.addCommentStatus = STATUS.SUCCEEDED;
-      })
-      .addCase(addAsyncComment.rejected, (state) => {
-        state.addCommentStatus = STATUS.FAILED;
+      .addCase(addAsyncComment.fulfilled, (state) => {
+        state.commentStatus = !state.commentStatus;
       });
   },
 });
 
 // selectors
 export const getAllComments = (state) => state.comment.comments;
-export const getCommentsStatus = (state) => state.comment.commentsStatus;
-export const getAddCommentStatus = (state) => state.comment.addCommentStatus;
+// export const getCommentStatus = (state) => state.comment.commentStatus;
 
 export default commentSlice.reducer;

@@ -2,9 +2,13 @@ import React, { useState } from "react";
 import { FaRegCirclePlay } from "react-icons/fa6";
 import { FcGoogle } from "react-icons/fc";
 import { BsPersonCircle } from "react-icons/bs";
-import { useNavigate } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import { IoMdEyeOff } from "react-icons/io";
+import { IoEye } from "react-icons/io5";
+import { useDispatch } from "react-redux";
+import { ragisterAsyncUser } from "../store/UserSlice";
 
 
 const Signup = () => {
@@ -12,7 +16,7 @@ const Signup = () => {
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [bannerPreview, setBannerPreview] = useState(null);
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   const {
     register,
     handleSubmit,
@@ -26,31 +30,32 @@ const Signup = () => {
 
   const password = watch("password");
 
-  const onSubmit = (data) => {
-    toast.success("Signup successful (demo)", {
-      position: "top-right",
-      autoClose: 2000,
-      theme: "dark",
-    });
-    console.log("Form data:", data);
-  };
-
-  const handleAvatarChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setAvatarPreview(URL.createObjectURL(file));
-      setValue("avatar", e.target.files); // Update RHF value
-      clearErrors("avatar"); // Clear error immediately
-    }
-  };
-
-  const handleBannerChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setBannerPreview(URL.createObjectURL(file));
-      setValue("banner", e.target.files); // Update RHF value
-      clearErrors("banner"); // Clear error immediately
-    }
+  const onSubmit = async (formData) => {
+     try {
+        const resultAction = await dispatch(ragisterAsyncUser(formData));
+  
+        if (ragisterAsyncUser.fulfilled.match(resultAction)) {
+           const ragisterUser = resultAction.payload; 
+           localStorage.setItem("user", JSON.stringify(ragisterUser));
+           toast.success("Registration successful", {
+              position: "top-right",
+              autoClose: 2000,
+              theme: "dark",
+           });
+           navigate("/");
+           window.location.reload();
+        } else {
+           throw new Error("Registration failed");
+        }
+     } catch (e) {
+        toast.error("Registration failed. Please try again.", {
+           position: "top-right",
+           autoClose: 2000,
+           theme: "dark",
+        });
+        navigate("/register");
+        console.log(e.message);
+     }
   };
 
   return (
@@ -58,37 +63,37 @@ const Signup = () => {
       <div className="w-full max-w-md mx-auto pt-10 rounded-lg ">
         {/* Logo */}
         <div className="text-center mb-8">
-          <a href="/" className="inline-flex items-center gap-2 mb-4">
+          <NavLink to="/" className="inline-flex items-center gap-2 mb-4">
             <span className="rounded-full flex items-center justify-center text-red-500 text-2xl mt-2 ml-[-3rem] font-bold">
               <FaRegCirclePlay />
             </span>
-            <span className="text-2xl font-bold text-white">TubeClone</span>
-          </a>
-          <h1 className="text-3xl font-bold text-white mb-2">Create account</h1>
-          <p className="text-gray-300">Join TubeClone today</p>
+            <span className="text-2xl font-bold dark:text-gray-300 text-gray-700">TubeClone</span>
+          </NavLink>
+          <h1 className="text-3xl font-bold text-gray-700 dark:text-gray-300 mb-2">Create account</h1>
+          <p className="dark:text-gray-300 text-gray-700">Join TubeClone today</p>
         </div>
 
         {/* Signup Form */}
         <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
           {/* Full Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-2">
               Full Name
             </label>
             <input
               type="text"
               placeholder="Enter your full name"
               className="w-full px-4 py-3 dark:bg-gray-800 bg-gray-100 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-              {...register("fullName", { required: "Full name is required" })}
+              {...register("fullname", { required: "Full name is required" })}
             />
-            {errors.fullName && (
-              <div className="text-red-500 text-sm mt-1">{errors.fullName.message}</div>
+            {errors.fullname && (
+              <div className="text-red-500 text-sm mt-1">{errors.fullname.message}</div>
             )}
           </div>
 
           {/* Username */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-2">
               Username
             </label>
             <input
@@ -104,7 +109,7 @@ const Signup = () => {
 
           {/* Email */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-2">
               Email address
             </label>
             <input
@@ -126,7 +131,7 @@ const Signup = () => {
 
           {/* Password */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-2">
               Password
             </label>
             <div className="relative">
@@ -144,7 +149,7 @@ const Signup = () => {
                 className="absolute right-4 top-3 text-gray-800 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? "Hide" : "Show"}
+                {showPassword ? <IoMdEyeOff /> : <IoEye />}
               </button>
             </div>
             {errors.password && (
@@ -154,7 +159,7 @@ const Signup = () => {
 
           {/* Confirm Password */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-2">
               Confirm Password
             </label>
             <input
@@ -174,7 +179,7 @@ const Signup = () => {
 
           {/* Avatar */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-2">
               Avatar
             </label>
             <div className="relative">
@@ -183,7 +188,14 @@ const Signup = () => {
                 accept="image/*"
                 className="w-full px-4 py-3 dark:bg-gray-800 bg-gray-100 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pl-12 pr-12 cursor-pointer"
                 {...register("avatar", { required: "Avatar is required" })}
-                onChange={handleAvatarChange}
+                onClick={(e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    setAvatarPreview(URL.createObjectURL(file));
+                    clearErrors("avatar");
+                    setValue("avatar", e.target.files);
+                  }
+                }}
               />
               <i className="absolute left-4 top-3 text-xl text-gray-300">
                 <BsPersonCircle />
@@ -201,17 +213,24 @@ const Signup = () => {
             )}
           </div>
 
-          {/* Banner Image (Optional) */}
+          {/* Banner (coverImage) REQUIRED */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Banner Image (Optional)
+            <label className="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-2">
+              Banner Image
             </label>
             <input
               type="file"
               accept="image/*"
               className="w-full px-4 py-3 dark:bg-gray-800 bg-gray-100 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 cursor-pointer"
-              {...register("banner")}
-              onChange={handleBannerChange}
+              {...register("coverImage", { required: "Banner is required" })}
+              onClick={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  setBannerPreview(URL.createObjectURL(file));
+                  clearErrors("coverImage");
+                  setValue("coverImage", e.target.files);
+                }
+              }}
             />
             {bannerPreview && (
               <img
@@ -219,6 +238,9 @@ const Signup = () => {
                 alt="Banner Preview"
                 className="mt-2 w-full h-32 rounded-lg object-cover"
               />
+            )}
+            {errors.coverImage && (
+              <div className="text-red-500 text-sm mt-1">{errors.coverImage.message}</div>
             )}
           </div>
 
@@ -234,7 +256,7 @@ const Signup = () => {
 
         {/* Signin link */}
         <div className="text-center mt-6">
-          <p className="text-gray-300">
+          <p className="dark:text-gray-300 text-gray-700">
             Already have an account?{" "}
             <button
               className="text-blue-400 underline cursor-pointer hover:text-blue-300 font-medium"
@@ -250,3 +272,6 @@ const Signup = () => {
 };
 
 export default Signup;
+
+
+ 

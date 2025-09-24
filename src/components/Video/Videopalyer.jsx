@@ -1,223 +1,393 @@
 import React, { useState, useEffect } from "react";
 import { AiFillLike } from "react-icons/ai";
-import { IoPersonCircleOutline } from "react-icons/io5";
 import { RiShareForwardLine } from "react-icons/ri";
-import { MdDeleteForever } from "react-icons/md";
-import { FaRegEdit } from "react-icons/fa";
 import SuggestedVideo from "./SuggestedVideo";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllVideos, fetchAsyncVideos } from "../../store/VideoFeatureSlice";
-import { fetchAsyncComments,getAllComments } from "../../store/CommentSlice"; // your comment slice
-import Loader from "../../Pages/Loader"; // your loader component
+import {
+  getAllVideos,
+  fetchAsyncVideos,
+  setVideoViews,
+} from "../../store/VideoFeatureSlice";
+import { setuserLike, getLike, getUserdetils } from "../../store/UserSlice";
+import Loader from "../../Pages/Loader";
+import { toast } from "react-toastify";
+import {
+  userSubscribeTochannel,
+  getChannelSubscibres,
+} from "../../store/subscriptionSlice";
+import {
+  fetchAsyncComments,
+  getAllComments,
+  addAsyncComment
+} from "../../store/CommentSlice";
+import CommentCard from "../comments/CommentCard";
+import { getVideoLikes } from '../../store/likeSlice'
 
-function Videoplayer({ singleVideo: {_id, title, videoFile, description, views, createdAt } }) {
-   const dispatch = useDispatch();
-   const videos = useSelector(getAllVideos);
-   // const allComments = useSelector(getAllComments);
-   const [loading, setLoading] = useState(true);
-   useEffect(() => {
-      const fetchData = async () => {
-         setLoading(true);
-         await dispatch(fetchAsyncVideos()); // fetch all suggested videos
-         await dispatch(fetchAsyncComments(_id)); // fetch all suggested videos
-         setLoading(false);
-      };
-      fetchData();
-   }, [dispatch]);
-  
-   
+function Videoplayer({
+  singleVideo: { _id, title, videoFile, description, views, createdAt, owner },
+}) {
+  const dispatch = useDispatch();
+  const videos = useSelector(getAllVideos);
+  const userLike = useSelector(getLike);
+  const commentStatus = useSelector((state) => state.comment.commentStatus);
+  const [likes, setlikes] = useState(0);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [showSubMenu, setShowSubMenu] = useState(false);
+  const [subscribeCount, setSubscribeCount] = useState(0);
+  const [ownerData, setOwnerData] = useState(null);
+  const user = localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user"))
+    : null;
 
-   const [showDesc, setShowDesc] = useState(false);
-   const [showShare, setShowShare] = useState(false);
-   const [comments, setComments] = useState([
-      { id: 1, user: "John Doe", text: "Great video! 🔥" },
-      { id: 2, user: "Jane Smith", text: "Very helpful, thanks!" },
-   ]);
-   const [newComment, setNewComment] = useState("");
-   const [editingCommentId, setEditingCommentId] = useState(null);
-   const [editText, setEditText] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [showDesc, setShowDesc] = useState(false);
+  const [showShare, setShowShare] = useState(false);
 
-   const handleAddComment = () => {
-      if (newComment.trim() === "") return;
-      const comment = { id: Date.now(), user: "You", text: newComment };
-      setComments([comment, ...comments]);
+  const [newComment, setNewComment] = useState("");
+  const [videoComment, setVideoComment] = useState(
+    useSelector(getAllComments)
+  );
+  const [commentLoading, setCommentLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchSubscribers = async () => {
+      if (_id) {
+        const resultActions = await dispatch(getChannelSubscibres(owner));
+        if (getChannelSubscibres.fulfilled.match(resultActions)) {
+          const subscribedChannels = resultActions.payload;
+
+          const subscribed = Array.isArray(subscribedChannels)
+            ? subscribedChannels.includes(user?._id)
+            : false;
+
+          setIsSubscribed(subscribed);
+          setSubscribeCount(subscribedChannels.length);
+        }
+        await dispatch(setVideoViews(_id));
+      }
+    };
+    fetchSubscribers();
+  }, [userLike, _id, dispatch, owner]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      await dispatch(fetchAsyncVideos());
+      setLoading(false);
+    };
+    fetchData();
+  }, [dispatch]);
+
+  useEffect(() => {
+    const getuserDitails = async (owner) => {
+      try {
+        if (!owner) return;
+        setLoading(true);
+        const resultAction = await dispatch(getUserdetils(owner));
+        if (getUserdetils.fulfilled.match(resultAction)) {
+          const loggedInUser = resultAction.payload;
+          setOwnerData(loggedInUser);
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    getuserDitails(owner);
+  }, [dispatch, owner]);
+
+  useEffect(() => {
+    const getAllCommentsData = async (id) => {
+      try {
+        setCommentLoading(true);
+        if (!id) return;
+        const resultAction = await dispatch(fetchAsyncComments(id));
+        if (fetchAsyncComments.fulfilled.match(resultAction)) {
+          const loggedInUser = resultAction.payload;
+          setVideoComment(loggedInUser);
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setCommentLoading(false);
+      }
+    };
+    getAllCommentsData(_id);
+  }, [_id, dispatch, commentStatus]);
+
+  const handleLike = async () => {
+    try {
+      if (!_id) return;
+
+      const resultAction = await dispatch(setuserLike(_id));
+
+      if (setuserLike.fulfilled.match(resultAction)) {
+        const loggedInUser = resultAction.payload;
+
+        // update likes count
+        setlikes(loggedInUser.length);
+        if (loggedInUser && loggedInUser.length >= 0) {
+
+          // check if current user has liked the video
+          const liked = loggedInUser.some((like) => like.likeBy.includes(user._id));
+          setIsLiked(liked);
+        } else {
+          setIsLiked(false);
+        }
+      } else {
+        console.log("Someting wrong in like handellike");
+
+      }
+    } catch (error) {
+      console.error("Error while liking video:", error);
+      toast.error("Something went wrong. Please try again.", {
+        autoClose: 2000,
+      });
+    }
+  };
+
+
+  const handleSubscription = async (id) => {
+    try {
+      if (!id) return;
+      if (!user) return;
+
+      const resultAction = await dispatch(userSubscribeTochannel(id));
+
+      if (userSubscribeTochannel.fulfilled.match(resultAction)) {
+        const loggedInUser = resultAction.payload;
+        if (loggedInUser && loggedInUser.length >= 0) {
+          // check if current user has liked the video
+          const liked = loggedInUser.some((like) => like.includes(user._id));
+          setIsSubscribed(liked);
+        } else {
+          setIsSubscribed(false);
+        }
+
+
+      } else {
+        toast.error("Subscription action failed, try again", {
+          autoClose: 2000,
+        });
+      }
+    } catch (error) {
+      console.error("Error while subscribing:", error);
+
+    }
+  };
+
+
+
+  // ✅ comment handler
+  const handleAddComment = async () => {
+    if (newComment.trim() === "") return;
+    if (!_id) return;
+    try {
+      if (!_id) return;
+      setLoading(true);
+      await dispatch(addAsyncComment({ _id, newComment }));
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
       setNewComment("");
-   };
+    }
 
-   const handleDeleteComment = (id) => setComments(comments.filter((c) => c.id !== id));
-   const handleEditStart = (comment) => {
-      setEditingCommentId(comment.id);
-      setEditText(comment.text);
-   };
-   const handleEditSave = (id) => {
-      setComments(comments.map((c) => (c.id === id ? { ...c, text: editText } : c)));
-      setEditingCommentId(null);
-      setEditText("");
-   };
 
-   const date = new Date(createdAt);
+  };
 
-   return (
-      <div className="text-gray-900 dark:text-white min-h-screen flex flex-col lg:flex-row gap-6 p-4">
-         {/* Video Section */}
-         <div className="flex-1">
-            {/* Video Player */}
-            <div className="w-full aspect-video rounded-lg overflow-hidden">
-               <video src={videoFile} controls></video>
+
+  useEffect(() => {
+    const fetchVideoLike = async () => {
+      try {
+        if (!user) return;
+        if (!_id) return;
+        const res = await dispatch(getVideoLikes(_id));
+        if (getVideoLikes.fulfilled.match(res)) {
+          const loggedInUser = res.payload;
+          if (loggedInUser.length > 0) {
+            setlikes(loggedInUser.length);
+            loggedInUser.map((like) => {
+              const liked = like.likeBy.includes(user._id)
+              if (liked) {
+                setIsLiked(true);
+              } else {
+                setIsLiked(false)
+              }
+            })
+          }
+
+        }
+
+      } catch (error) {
+        console.log(error);
+
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchVideoLike()
+  }, [dispatch, user])
+
+
+  const date = new Date(createdAt);
+
+
+  return (
+    <div className="text-gray-900 dark:text-white min-h-screen flex flex-col lg:flex-row gap-6 p-4">
+      {/* Video Section */}
+      <div className="flex-1">
+        <div className="w-full aspect-video rounded-lg overflow-hidden">
+          <video src={videoFile} controls
+            autoPlay
+            muted={false}
+            loop
+            volume={1.0} />
+        </div>
+
+        {/* Video Info */}
+        <div className="flex justify-between items-center mt-2 mb-2">
+          <div className="flex-1 ">
+            <h1 className="text sm:text-xl font-bold mt-3">{title}</h1>
+            <div className="text-sm text-gray-700 dark:text-gray-300 sm:gap-[2px]  flex-1 sm:flex">
+              <p>{views} views • {"  "}</p>
+              <p>{date.toLocaleString("en-US", {
+                month: "long",
+                year: "numeric",
+              })}</p>
             </div>
+          </div>
+          <div className="relative">
+            {!isSubscribed ? (
+              <button
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 font-semibold text-white rounded-full"
+                onClick={() => handleSubscription(owner)}
+              >
+                Subscribe
+              </button>
+            ) : (
+              <div>
+                <button
+                  className="px-4 py-2 bg-gray-700 hover:bg-gray-800 font-semibold text-white rounded-full"
+                  onClick={() => handleSubscription(owner)}
+                >
+                  Subscribed
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
 
-            {/* Video Info */}
-            <div className="flex justify-between items-center mt-2 mb-2">
-               <div>
-                  <h1 className="text sm:text-xl font-bold mt-3">{title}</h1>
-                  <p className="text-sm text-gray-700 dark:text-gray-300">
-                     {views} views • {date.toLocaleString("en-US", { month: "long", year: "numeric" })}
-                  </p>
-               </div>
-               <div>
-                  <button className="px-4 py-2 bg-red-600 hover:bg-red-700 font-semibold text-white rounded-full flex justify-center items-center">
-                     Subscribe
-                  </button>
-               </div>
+        {/* Actions */}
+        <div className="flex-1 flex-wrap md:flex justify-between items-center gap-4 mt-3">
+          <div className="flex justify-start items-center gap-4">
+            <div className="h-14 w-14">
+              <img
+                src={
+                  ownerData?.avatar ||
+                  "https://via.placeholder.com/36x36.png?text=U"
+                }
+                alt="Channel avatar"
+                className="w-12 h-12 rounded-full object-cover"
+              />
             </div>
-
-            {/* Actions */}
-            <div className="flex-1 flex-wrap md:flex justify-between items-center gap-4 mt-3">
-               <div className="flex justify-start items-center gap-4">
-                  <div className="text-5xl h-10 w-10 rounded-full bg-red-400 flex justify-center items-center">
-                     <IoPersonCircleOutline />
-                  </div>
-                  <div className="flex-col items-center justify-center">
-                     <div>Channel Name</div>
-                     <div className="text-[12px]">730K Subscribers</div>
-                  </div>
-               </div>
-               <div className="flex gap-2 mt-4 md:mt-0">
-                  <button className="flex items-center gap-1 px-6 py-2 bg-gray-300 dark:bg-gray-900 rounded-full hover:bg-gray-400 dark:hover:bg-gray-700">
-                     <AiFillLike /> 120
-                  </button>
-                  <button
-                     onClick={() => setShowShare(true)}
-                     className="flex items-center gap-1 px-5 py-2 bg-gray-300 dark:bg-gray-900 rounded-full hover:bg-gray-400 dark:hover:bg-gray-700"
-                  >
-                     <RiShareForwardLine /> Share
-                  </button>
-               </div>
+            <div>
+              <div>{ownerData?.username || "Channel name"}</div>
+              <div className="text-[12px]">{subscribeCount} Subscribers</div>
             </div>
+          </div>
+          <div className="flex gap-2 mt-4 md:mt-0">
+            <button
+              className="flex items-center gap-1 px-6 py-2 bg-gray-300 dark:bg-gray-900 rounded-full hover:bg-gray-400 dark:hover:bg-gray-700"
+              onClick={handleLike}
+            >
+              <span
+                className={`${isLiked ? "text-blue-600" : "text-gray-500"
+                  } text-[1.2rem]`}
+              >
+                <AiFillLike />
+              </span>{" "}
+              {likes}
+            </button>
+            <button
+              onClick={() => setShowShare(true)}
+              className="flex items-center gap-1 px-5 py-2 bg-gray-300 dark:bg-gray-900 rounded-full hover:bg-gray-400 dark:hover:bg-gray-700"
+            >
+              <RiShareForwardLine /> Share
+            </button>
+          </div>
+        </div>
 
-            {/* Description */}
-            <div className="mt-4">
-               <button
-                  onClick={() => setShowDesc(!showDesc)}
-                  className="text-blue-600 hover:underline cursor-pointer text-sm"
-               >
-                  {showDesc ? "Hide Description" : "Show Description"}
-               </button>
-               {showDesc && (
-                  <p className="mt-2 text-sm text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-800 p-3 rounded-lg">
-                     {description}
-                  </p>
-               )}
-            </div>
+        {/* Description */}
+        <div className="mt-4">
+          <button
+            onClick={() => setShowDesc(!showDesc)}
+            className="text-blue-600 hover:underline cursor-pointer text-sm"
+          >
+            {showDesc ? "Hide Description" : "Show Description"}
+          </button>
+          {showDesc && (
+            <p className="mt-2 text-sm text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-800 p-3 rounded-lg">
+              {description}
+            </p>
+          )}
+        </div>
 
-            {/* Comments */}
-            <div className="mt-6">
-               <h2 className="font-semibold text-lg mb-2">Comments</h2>
-               <div className="flex items-center gap-2 mb-4">
-                  <input
-                     type="text"
-                     placeholder="Add a comment..."
-                     value={newComment}
-                     onChange={(e) => setNewComment(e.target.value)}
-                     className="flex-1 px-3 py-2 border-b dark:bg-[#202222] bg-gray-100 outline-none text-md"
-                  />
-                  <button
-                     onClick={handleAddComment}
-                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                  >
-                     Comment
-                  </button>
-               </div>
+        {/* ✅ Comment Section */}
+        <div className="mt-6">
+          <h2 className="text-lg font-semibold mb-3">
+            Comments ({videoComment?.length || 0})
+          </h2>
 
-               {comments.length === 0 ? (
-                  <p className="text-gray-500">No comments yet. Be the first!</p>
-               ) : (
-                  <div className="space-y-4 dark:bg-[#212222] p-3 rounded-lg">
-                     {comments.map((c) => (
-                        <div key={c.id} className="dark:bg-[#202222] p-3 rounded-lg flex justify-between items-start">
-                           <div className="flex-1">
-                              <p className="font-semibold">{c.user}</p>
-                              {editingCommentId === c.id ? (
-                                 <div className="flex gap-2 mt-1">
-                                    <input
-                                       type="text"
-                                       value={editText}
-                                       onChange={(e) => setEditText(e.target.value)}
-                                       className="flex-1 px-2 py-1 border-b dark:bg-gray-900"
-                                    />
-                                    <button onClick={() => handleEditSave(c.id)} className="px-2 py-1 bg-blue-600 text-white rounded text-sm">
-                                       Save
-                                    </button>
-                                    <button onClick={() => setEditingCommentId(null)} className="px-2 py-1 bg-gray-400 text-white rounded text-sm">
-                                       Cancel
-                                    </button>
-                                 </div>
-                              ) : (
-                                 <p className="text-sm text-gray-600 dark:text-gray-400">{c.text}</p>
-                              )}
-                           </div>
-                           {c.user === "You" && editingCommentId !== c.id && (
-                              <div className="flex gap-2 ml-2">
-                                 <button onClick={() => handleEditStart(c)} className="text-blue-500 flex items-center">
-                                    <FaRegEdit /> Edit
-                                 </button>
-                                 <button onClick={() => handleDeleteComment(c.id)} className="text-red-500 flex items-center">
-                                    <MdDeleteForever /> Delete
-                                 </button>
-                              </div>
-                           )}
-                        </div>
-                     ))}
-                  </div>
-               )}
-            </div>
-         </div>
+          {/* Input */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mb-4">
+            <input
+              type="text"
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Add a comment..."
+              className="flex-1 px-3 py-2 rounded-lg border dark:border-gray-700 dark:bg-gray-900 outline-none  mr-3 sm:mr-0"
+            />
+            <button
+              onClick={handleAddComment}
+              className="px-4 py-2 text-center bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+            >
+              Post
+            </button>
+          </div>
 
-         {/* Suggested Videos */}
-         <aside className="w-full lg:w-80 space-y-4">
-            <h2 className="font-semibold mb-2">Suggested Videos</h2>
-            <div className="space-y-2">
-               {loading ? (
-                  <Loader />
-               ) : (
-                  videos?.map((video) => (
-                     <SuggestedVideo key={video._id} video={video} />
-                  ))
-               )}
-            </div>
-         </aside>
-
-         {/* Share Modal */}
-         {showShare && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-               <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg w-80">
-                  <h3 className="text-lg font-bold mb-3">Share Video</h3>
-                  <input
-                     type="text"
-                     value="https://yourdomain.com/video/123"
-                     readOnly
-                     className="w-full px-3 py-2 border rounded bg-gray-100 dark:bg-gray-800"
-                  />
-                  <div className="flex justify-end mt-4">
-                     <button onClick={() => setShowShare(false)} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                        Close
-                     </button>
-                  </div>
-               </div>
-            </div>
-         )}
+          {/* List */}
+          <div className="space-y-3">
+            {commentLoading ? (
+              <Loader />
+            ) : videoComment && videoComment.length > 0 ? (
+              videoComment.map((comment) => (
+                <CommentCard key={comment._id} comment={comment} />
+              ))
+            ) : (
+              <p className="text-sm text-gray-500">No comments yet.</p>
+            )}
+          </div>
+        </div>
       </div>
-   );
+
+      {/* Suggested Videos */}
+      <div className="w-full lg:w-80 space-y-4">
+        <h2 className="font-semibold mb-2">Suggested Videos</h2>
+        <div className="space-y-2">
+          {loading ? (
+            <Loader />
+          ) : (
+            videos?.map((video) => (
+              <SuggestedVideo key={video._id} video={video} />
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default Videoplayer;
