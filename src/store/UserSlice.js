@@ -79,10 +79,9 @@ export const loginAsyncUser = createAsyncThunk(
     try {
       const response = await fetch(`${baseUrl}/users/login`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
+        credentials: "include",
       });
 
       if (!response.ok) {
@@ -213,7 +212,9 @@ export const getUserLikedVideos = createAsyncThunk(
     } catch (error) {
       // Axios error handling
       return rejectWithValue(
-        error.response?.data?.message || error.message || "Failed to fetch liked videos"
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to fetch liked videos"
       );
     }
   }
