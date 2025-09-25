@@ -33,7 +33,6 @@ function Videoplayer({
   const [likes, setlikes] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
-  const [showSubMenu, setShowSubMenu] = useState(false);
   const [subscribeCount, setSubscribeCount] = useState(0);
   const [ownerData, setOwnerData] = useState(null);
   const user = localStorage.getItem("user")
@@ -43,7 +42,7 @@ function Videoplayer({
   const [loading, setLoading] = useState(true);
   const [showDesc, setShowDesc] = useState(false);
   const [showShare, setShowShare] = useState(false);
-
+  const [isLoggedin, setIsLoggedin] = useState(false)
   const [newComment, setNewComment] = useState("");
   const [videoComment, setVideoComment] = useState(
     useSelector(getAllComments)
@@ -51,6 +50,16 @@ function Videoplayer({
   const [commentLoading, setCommentLoading] = useState(false);
 
   useEffect(() => {
+    const cookie = document.cookie.split("=")
+    if (cookie[0] == "isLoggedin" && cookie[1] == 'true') {
+      setIsLoggedin(true);
+    } else {
+      setIsLoggedin(false);
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!owner) return;
     const fetchSubscribers = async () => {
       if (_id) {
         const resultActions = await dispatch(getChannelSubscibres(owner));
@@ -118,6 +127,7 @@ function Videoplayer({
   }, [_id, dispatch, commentStatus]);
 
   const handleLike = async () => {
+    if (!isLoggedin) return
     try {
       if (!_id) return;
 
@@ -153,6 +163,7 @@ function Videoplayer({
     try {
       if (!id) return;
       if (!user) return;
+      if (!isLoggedin) return;
 
       const resultAction = await dispatch(userSubscribeTochannel(id));
 
@@ -182,6 +193,7 @@ function Videoplayer({
 
   // ✅ comment handler
   const handleAddComment = async () => {
+    if (!isLoggedin) return;
     if (newComment.trim() === "") return;
     if (!_id) return;
     try {
@@ -229,7 +241,7 @@ function Videoplayer({
       }
     }
     fetchVideoLike()
-  }, [dispatch, user])
+  }, [dispatch, user, _id])
 
 
   const date = new Date(createdAt);

@@ -13,14 +13,14 @@ function LikeVideo() {
   useEffect(() => {
     // Fetch user history when component mounts
     // Assuming you have a Redux action to fetch user history
-    dispatch(getUserLikedVideos());
-  }, [userLiked]);
+    if (document.cookie) dispatch(getUserLikedVideos());
+  }, [userLiked, dispatch]);
   return (
     <>
       {/* <!-- Main Content --> */}
       <div className="flex">
         {/* <!-- Main Content Area --> */}
-        <main className="flex-1 p-auto ml-0  pt-20" >
+        <main className="flex-1 p-auto ml-0  pt-20 min-h-screen" >
           {/* <!-- Header --> */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold mb-2" >Liked Videos</h1>

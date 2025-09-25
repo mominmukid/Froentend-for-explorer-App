@@ -28,6 +28,7 @@ export const addAsyncCommentLike = createAsyncThunk(
   "comments/add",
   async (id, { rejectWithValue }) => {
     try {
+      if (!id) return;
       const response = await fetch(`${baseUrl}/like/togglecomment/${id}`, {
         method: "POST",
         headers: {

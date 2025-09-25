@@ -18,19 +18,17 @@ function Dashboard() {
   const [fallbackCover, setFallbackCover] = useState(null);
   const [totalViews, setTotalViews] = useState(0);
   const [totalSubscribers, setTotalSubscribers] = useState([]);
-
-  const user = reduxUser?.user || localUser;
-
   // Load user from localStorage and set fallback cover
   useEffect(() => {
     const userData = localStorage.getItem("user");
     if (userData) setLocalUser(JSON.parse(userData));
     setFallbackCover("https://picsum.photos/1600/400");
   }, [reduxUser]);
-
+  const user = reduxUser?.user || localUser;
   // Fetch videos
   useEffect(() => {
     const fetchVideo = async () => {
+      // if (!user) return;
       setLoadingVideos(true);
       try {
         const resultAction = await dispatch(getvideosUser());
@@ -48,8 +46,7 @@ function Dashboard() {
 
   // Fetch subscribers after localUser._id is available
   useEffect(() => {
-    if (!localUser?._id) return;
-
+    if (!user?._id || !user) return;
     const fetchSubscribers = async () => {
       setLoadingSubs(true);
       try {
@@ -148,7 +145,7 @@ function Dashboard() {
             [...userVid[0].userVideos]
               .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
               .map((video) => (
-                
+
                 <DashboardVideo
                   key={video._id}
                   video={video}

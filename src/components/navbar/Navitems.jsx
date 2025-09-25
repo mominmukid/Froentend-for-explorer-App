@@ -9,20 +9,22 @@ import { GoSun } from "react-icons/go";
 import { IoMoon } from "react-icons/io5";
 import { useSelector } from 'react-redux';
 import { getUser } from '../../store/UserSlice';
+import AltImage from '../../../public/Images/profile.png'
 
 function Navitems({ handelList, handleIsBlock }) {
-   
-  const reduxUser = useSelector(getUser);
-const [localUser, setLocalUser] = useState(null);
 
-useEffect(() => {
-  const userData = localStorage.getItem("user");
-  if (userData) {
-    setLocalUser(JSON.parse(userData));
-  }
-}, [reduxUser]); // 👈 rerun when reduxUser changes
+   const reduxUser = useSelector(getUser);
+   const userStatus = useSelector((state) => state.user.userStatus)
+   const [localUser, setLocalUser] = useState(null);
 
-const user = reduxUser?.user || localUser;
+   useEffect(() => {
+      const userData = localStorage.getItem("user");
+      if (userData) {
+         setLocalUser(JSON.parse(userData));
+      }
+   }, [reduxUser, userStatus]); // 👈 rerun when reduxUser changes
+
+   const user = reduxUser?.user || localUser;
    // ✅ Dark mode state
    const [isDark, setisDark] = useState(false);
 
@@ -81,9 +83,9 @@ const user = reduxUser?.user || localUser;
                onClick={handleIsBlock}
             >
                {user && user?.avatar ? (
-                  <img src={user?.avatar} alt="public/images/profile.png" className='w-10 h-10 object-cover' />
+                  <img src={user?.avatar} alt="public/Images/profile.png" className='w-10 h-10 object-cover dark:bg-gray-600' />
                ) : (
-                  <img src="public/images/profile.png" alt="public/images/profile.png" className='w-10 h-10 object-cover' />
+                  <img src={AltImage} alt={AltImage} className='w-10 h-10 object-cover dark:bg-gray-600' />
                )}
             </span>
 

@@ -4,17 +4,46 @@ import { IoIosSettings } from "react-icons/io";
 import { NavLink } from "react-router";
 import { clearUser } from '../../store/UserSlice';
 import { useDispatch } from "react-redux";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { logoutUser } from '../../store/UserSlice'
+import { toast } from "react-toastify";
 
 function ProfileBtn({ isblock, setIsblock }) {
   const dispatch = useDispatch();
   const dropdownRef = useRef(null);
-
-  const logout = () => {
+  const cookie = document.cookie;
+  const [isLogin, setIslogin] = useState(false);
+  const logout = async () => {
     localStorage.removeItem("user");
     dispatch(clearUser());
     setIsblock(false);
+    const resultAction = await dispatch(logoutUser());
+    if (logoutUser.fulfilled.match(resultAction)) {
+      toast.success("Logout successFully", {
+        position: "top-right",
+        autoClose: 1000,
+        theme: "dark",
+      });
+      window.location.reload();
+    } else {
+      toast.error(" Logout failed", {
+        position: "top-right",
+        autoClose: 2000,
+        theme: "dark",
+      });
+      throw new Error("logout Failed failed");
+    }
   };
+
+  useEffect(() => {
+    if (cookie) {
+      setIslogin(true)
+    } else {
+      setIslogin(false)
+    }
+
+
+  }, [logout])
 
   // Hide dropdown when clicking outside
   useEffect(() => {
@@ -28,7 +57,8 @@ function ProfileBtn({ isblock, setIsblock }) {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [setIsblock]);
+
+  }, [setIsblock, dispatch]);
 
   return (
     <div ref={dropdownRef}>
@@ -37,7 +67,7 @@ function ProfileBtn({ isblock, setIsblock }) {
       >
         <NavLink
           to="/dashboard"
-          className="w-full pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer"
+          className={`${isLogin ? "block" : "hidden"} w-full pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer`}
           onClick={() => setIsblock(false)}
         >
           <span className="text-[23px] font-extrabold">
@@ -48,7 +78,7 @@ function ProfileBtn({ isblock, setIsblock }) {
 
         <NavLink
           to="/login"
-          className="w-full pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer"
+          className={` ${!isLogin ? "block" : "hidden"}w-full pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer`}
           onClick={() => setIsblock(false)}
         >
           <span className="text-[23px] font-extrabold">
@@ -59,7 +89,7 @@ function ProfileBtn({ isblock, setIsblock }) {
 
         <NavLink
           to="/setting"
-          className="w-full pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer"
+          className={`${isLogin ? "block" : "hidden"} w-full pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer`}
           onClick={() => setIsblock(false)}
         >
           <span className="text-[23px] font-extrabold">
@@ -70,7 +100,7 @@ function ProfileBtn({ isblock, setIsblock }) {
 
         <hr className="text-gray-400 mt-2" />
         <ul
-          className="w-full pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer"
+          className={`${isLogin ? "block" : "hidden"} w-full pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer`}
           onClick={logout}
         >
           <span className="text-[25px] text-red-600 font-extrabold">

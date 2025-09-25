@@ -18,11 +18,21 @@ function CommentCard({ comment: { content, createdAt, _id, owner, likes = [] } }
    // Like state
    const [isLiked, setIsLiked] = useState(false);
    const [likeCount, setLikeCount] = useState(likes?.length || 0);
+   const [isLoggedin, setIsLoggedin] = useState(false)
 
    const dispatch = useDispatch();
    const user = localStorage.getItem("user")
       ? JSON.parse(localStorage.getItem("user"))
       : null;
+
+   useEffect(() => {
+      const cookie = document.cookie.split("=")
+      if (cookie[0] == "isLoggedin" && cookie[1] == 'true') {
+         setIsLoggedin(true);
+      } else {
+         setIsLoggedin(false);
+      }
+   }, [])
 
    useEffect(() => {
       const getuserDitails = async (ownerId) => {
@@ -96,11 +106,12 @@ function CommentCard({ comment: { content, createdAt, _id, owner, likes = [] } }
       try {
          if (!_id) return;
          if (!user) return;
+         if (!isLoggedin) return;
          setLoading(true);
          const res = await dispatch(addAsyncCommentLike(_id));
          if (addAsyncCommentLike.fulfilled.match(res)) {
             const loggedInUser = res.payload;
-            
+
             if (loggedInUser && loggedInUser.length >= 0) {
                // check if current user has liked the video
                const liked = loggedInUser.some((like) => like.likeBy.includes(user._id));
@@ -144,7 +155,7 @@ function CommentCard({ comment: { content, createdAt, _id, owner, likes = [] } }
          }
       }
       fetchCommentLike()
-   }, [dispatch])
+   }, [dispatch, user, _id])
 
 
 

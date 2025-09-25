@@ -39,7 +39,6 @@ function Login() {
             });
 
             navigate("/");
-            window.location.reload();
          } else {
             throw new Error("Login failed");
          }

@@ -10,19 +10,25 @@ import { toast } from 'react-toastify';
 function History() {
   const userHistory = useSelector(getUserhistory);
   const dispatch = useDispatch();
-     let isuserHistoryEmpty = false;
+  let isuserHistoryEmpty = false;
   if (userHistory && userHistory.length === 0) {
     isuserHistoryEmpty = true;
   }
+
+  const user = localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user"))
+    : null;
   useEffect(() => {
-    // Fetch user history when component mounts
-    // Assuming you have a Redux action to fetch user history
+    getHistory()
+  }, [user]);
+
+  const getHistory = async () => {
+   if(!document.cookie && !user?._id) return
     dispatch(getUserHistory());
-  }, []);
+  }
 
   const handleClearHistory = async () => {
     const resultAction = await dispatch(clerWatchHistory());
-
     if (clerWatchHistory.fulfilled.match(resultAction)) {
       toast.success("History cleared", {
         position: "top-right",
