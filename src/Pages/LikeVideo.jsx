@@ -13,7 +13,7 @@ function LikeVideo() {
   useEffect(() => {
     // Fetch user history when component mounts
     // Assuming you have a Redux action to fetch user history
-    if (document.cookie) dispatch(getUserLikedVideos());
+    dispatch(getUserLikedVideos());
   }, [userLiked, dispatch]);
   return (
     <>

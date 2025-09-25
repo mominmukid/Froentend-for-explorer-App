@@ -12,6 +12,7 @@ const initialState = {
   error: null,
   userStatus: true,
   rgisterSatus: STATUS.IDLE,
+  isLoogedIn: false,
 };
 
 // Async thunks
@@ -283,6 +284,7 @@ const userSclice = createSlice({
       })
       .addCase(loginAsyncUser.fulfilled, (state, action) => {
         state.user = action.payload;
+        state.isLoogedIn = true;
         state.userStatus = STATUS.SUCCEEDED;
       })
       .addCase(loginAsyncUser.rejected, (state) => {
@@ -321,6 +323,7 @@ const userSclice = createSlice({
       })
       .addCase(logoutUser.fulfilled, (state) => {
         state.userStatus = !state.userStatus;
+        state.isLoogedIn = false;
       });
   },
 });

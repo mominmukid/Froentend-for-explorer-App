@@ -16,6 +16,7 @@ function Subscription() {
   useEffect(() => {
     const fetchUserSubscribrs = async (id) => {
       try {
+        if (!id) return;
         setLoading(true);
         const resultAction = await dispatch(getUserSubscribers(id))
         if (getUserSubscribers.fulfilled.match(resultAction)) {
@@ -25,11 +26,11 @@ function Subscription() {
       } catch (error) {
         console.error("Error fetching subscriptions:", error);
       } finally {
-        setLoading(false);
+        setLoading(false); 
       }
     }
     if (user?._id) {
-      fetchUserSubscribrs(user._id)
+      fetchUserSubscribrs(user?._id)
     }
   }, [dispatch, user?._id])
 
@@ -52,7 +53,7 @@ function Subscription() {
         ) : (
           <>
             {/* Example Latest Videos Section */}
-            
+
 
             {/* Channels Tab Content */}
             <div className="block mt-10">
@@ -61,7 +62,7 @@ function Subscription() {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   {subscribes.map((video) => (
-                    <Subscribs key={video._id} video={video} userId={user?._id}/>
+                    <Subscribs key={video._id} video={video} userId={user?._id} />
                   ))}
                 </div>
               )}

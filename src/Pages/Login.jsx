@@ -29,15 +29,12 @@ function Login() {
 
             // ✅ Save user object in localStorage
             localStorage.setItem("user", JSON.stringify(loggedInUser.user));
-
-        
-
             toast.success("Login successful", {
                position: "top-right",
                autoClose: 500,
                theme: "dark",
             });
-
+            window.location.reload();
             navigate("/");
          } else {
             throw new Error("Login failed");
@@ -130,7 +127,7 @@ function Login() {
                            maxLength: { value: 20, message: "Max length is 20" },
                         })}
                      />
-                    
+
                      <button
                         type="button"
                         onClick={() => setPasswordVisible(!passwordVisible)}

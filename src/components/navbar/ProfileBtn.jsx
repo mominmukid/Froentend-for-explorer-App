@@ -8,11 +8,15 @@ import { useEffect, useRef, useState } from "react";
 import { logoutUser } from '../../store/UserSlice'
 import { toast } from "react-toastify";
 
+
+
 function ProfileBtn({ isblock, setIsblock }) {
   const dispatch = useDispatch();
   const dropdownRef = useRef(null);
-  const cookie = document.cookie;
-  const [isLogin, setIslogin] = useState(false);
+  const [localUser, setLocalUser] = useState(null);
+
+
+
   const logout = async () => {
     localStorage.removeItem("user");
     dispatch(clearUser());
@@ -35,15 +39,13 @@ function ProfileBtn({ isblock, setIsblock }) {
     }
   };
 
+
   useEffect(() => {
-    if (cookie) {
-      setIslogin(true)
-    } else {
-      setIslogin(false)
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      setLocalUser(JSON.parse(userData));
     }
-
-
-  }, [logout])
+  }, [dispatch,]);
 
   // Hide dropdown when clicking outside
   useEffect(() => {
@@ -67,7 +69,7 @@ function ProfileBtn({ isblock, setIsblock }) {
       >
         <NavLink
           to="/dashboard"
-          className={`${isLogin ? "block" : "hidden"} w-full pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer`}
+          className={`${localUser ? "block" : "hidden"} w-full pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer`}
           onClick={() => setIsblock(false)}
         >
           <span className="text-[23px] font-extrabold">
@@ -78,7 +80,7 @@ function ProfileBtn({ isblock, setIsblock }) {
 
         <NavLink
           to="/login"
-          className={` ${!isLogin ? "block" : "hidden"}w-full pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer`}
+          className={` ${!localUser ? "block" : "hidden"}w-full pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer`}
           onClick={() => setIsblock(false)}
         >
           <span className="text-[23px] font-extrabold">
@@ -89,7 +91,7 @@ function ProfileBtn({ isblock, setIsblock }) {
 
         <NavLink
           to="/setting"
-          className={`${isLogin ? "block" : "hidden"} w-full pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer`}
+          className={`${localUser ? "block" : "hidden"} w-full pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer`}
           onClick={() => setIsblock(false)}
         >
           <span className="text-[23px] font-extrabold">
@@ -100,7 +102,7 @@ function ProfileBtn({ isblock, setIsblock }) {
 
         <hr className="text-gray-400 mt-2" />
         <ul
-          className={`${isLogin ? "block" : "hidden"} w-full pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer`}
+          className={`${localUser ? "block" : "hidden"} w-full pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer`}
           onClick={logout}
         >
           <span className="text-[25px] text-red-600 font-extrabold">

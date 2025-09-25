@@ -22,6 +22,7 @@ function Navitems({ handelList, handleIsBlock }) {
       if (userData) {
          setLocalUser(JSON.parse(userData));
       }
+
    }, [reduxUser, userStatus]); // 👈 rerun when reduxUser changes
 
    const user = reduxUser?.user || localUser;
