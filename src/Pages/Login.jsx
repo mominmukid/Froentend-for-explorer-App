@@ -34,8 +34,8 @@ function Login() {
                autoClose: 500,
                theme: "dark",
             });
-            window.location.reload();
             navigate("/");
+            window.location.reload();
          } else {
             throw new Error("Login failed");
          }
