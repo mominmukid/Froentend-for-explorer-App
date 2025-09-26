@@ -35,7 +35,7 @@ function Login() {
                theme: "dark",
             });
             navigate("/");
-            window.location.reload();
+            // window.location.reload();
          } else {
             throw new Error("Login failed");
          }

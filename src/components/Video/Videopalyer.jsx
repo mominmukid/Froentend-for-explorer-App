@@ -18,10 +18,11 @@ import {
 import {
   fetchAsyncComments,
   getAllComments,
-  addAsyncComment
+  addAsyncComment,
 } from "../../store/CommentSlice";
 import CommentCard from "../comments/CommentCard";
-import { getVideoLikes } from '../../store/likeSlice'
+import { getVideoLikes } from "../../store/likeSlice";
+import VideoPlayer from "../videojs/VideoPlayer";
 
 function Videoplayer({
   singleVideo: { _id, title, videoFile, description, views, createdAt, owner },
@@ -30,11 +31,13 @@ function Videoplayer({
   const videos = useSelector(getAllVideos);
   const userLike = useSelector(getLike);
   const commentStatus = useSelector((state) => state.comment.commentStatus);
+
   const [likes, setlikes] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [subscribeCount, setSubscribeCount] = useState(0);
   const [ownerData, setOwnerData] = useState(null);
+
   const user = localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user"))
     : null;
@@ -42,22 +45,29 @@ function Videoplayer({
   const [loading, setLoading] = useState(true);
   const [showDesc, setShowDesc] = useState(false);
   const [showShare, setShowShare] = useState(false);
-  const [isLoggedin, setIsLoggedin] = useState(false)
+  const [isLoggedin, setIsLoggedin] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [videoComment, setVideoComment] = useState(
     useSelector(getAllComments)
   );
   const [commentLoading, setCommentLoading] = useState(false);
+  const [videoUrl, setVideoUrl] = useState(videoFile);
 
+  // useEffect(() => {
+  //   setVideoUrl(videoFile)
+  //   console.log(videoUrl);
+
+  // }, [title,_id])
+  // Check login from cookie
   useEffect(() => {
-    const cookie = document.cookie.split("=")
-    if (cookie[0] == "isLoggedin" && cookie[1] == 'true') {
+    if (user) {
       setIsLoggedin(true);
     } else {
       setIsLoggedin(false);
     }
-  }, [])
+  }, []);
 
+  // Fetch subscribers & views
   useEffect(() => {
     if (!owner) return;
     const fetchSubscribers = async () => {
@@ -65,11 +75,9 @@ function Videoplayer({
         const resultActions = await dispatch(getChannelSubscibres(owner));
         if (getChannelSubscibres.fulfilled.match(resultActions)) {
           const subscribedChannels = resultActions.payload;
-
           const subscribed = Array.isArray(subscribedChannels)
             ? subscribedChannels.includes(user?._id)
             : false;
-
           setIsSubscribed(subscribed);
           setSubscribeCount(subscribedChannels.length);
         }
@@ -77,8 +85,10 @@ function Videoplayer({
       }
     };
     fetchSubscribers();
+
   }, [userLike, _id, dispatch, owner]);
 
+  // Fetch all videos
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -88,6 +98,7 @@ function Videoplayer({
     fetchData();
   }, [dispatch]);
 
+  // Fetch owner details
   useEffect(() => {
     const getuserDitails = async (owner) => {
       try {
@@ -95,8 +106,7 @@ function Videoplayer({
         setLoading(true);
         const resultAction = await dispatch(getUserdetils(owner));
         if (getUserdetils.fulfilled.match(resultAction)) {
-          const loggedInUser = resultAction.payload;
-          setOwnerData(loggedInUser);
+          setOwnerData(resultAction.payload);
         }
       } catch (error) {
         console.log(error);
@@ -107,6 +117,7 @@ function Videoplayer({
     getuserDitails(owner);
   }, [dispatch, owner]);
 
+  // Fetch comments
   useEffect(() => {
     const getAllCommentsData = async (id) => {
       try {
@@ -114,8 +125,7 @@ function Videoplayer({
         if (!id) return;
         const resultAction = await dispatch(fetchAsyncComments(id));
         if (fetchAsyncComments.fulfilled.match(resultAction)) {
-          const loggedInUser = resultAction.payload;
-          setVideoComment(loggedInUser);
+          setVideoComment(resultAction.payload);
         }
       } catch (error) {
         console.log(error);
@@ -126,78 +136,40 @@ function Videoplayer({
     getAllCommentsData(_id);
   }, [_id, dispatch, commentStatus]);
 
+  // Handle like
   const handleLike = async () => {
-    if (!isLoggedin) return
-    try {
-      if (!_id) return;
-
-      const resultAction = await dispatch(setuserLike(_id));
-
-      if (setuserLike.fulfilled.match(resultAction)) {
-        const loggedInUser = resultAction.payload;
-
-        // update likes count
-        setlikes(loggedInUser.length);
-        if (loggedInUser && loggedInUser.length >= 0) {
-
-          // check if current user has liked the video
-          const liked = loggedInUser.some((like) => like.likeBy.includes(user._id));
-          setIsLiked(liked);
-        } else {
-          setIsLiked(false);
-        }
-      } else {
-        console.log("Someting wrong in like handellike");
-
-      }
-    } catch (error) {
-      console.error("Error while liking video:", error);
-      toast.error("Something went wrong. Please try again.", {
-        autoClose: 2000,
-      });
-    }
-  };
-
-
-  const handleSubscription = async (id) => {
-    try {
-      if (!id) return;
-      if (!user) return;
-      if (!isLoggedin) return;
-
-      const resultAction = await dispatch(userSubscribeTochannel(id));
-
-      if (userSubscribeTochannel.fulfilled.match(resultAction)) {
-        const loggedInUser = resultAction.payload;
-        if (loggedInUser && loggedInUser.length >= 0) {
-          // check if current user has liked the video
-          const liked = loggedInUser.some((like) => like.includes(user._id));
-          setIsSubscribed(liked);
-        } else {
-          setIsSubscribed(false);
-        }
-
-
-      } else {
-        toast.error("Subscription action failed, try again", {
-          autoClose: 2000,
-        });
-      }
-    } catch (error) {
-      console.error("Error while subscribing:", error);
-
-    }
-  };
-
-
-
-  // ✅ comment handler
-  const handleAddComment = async () => {
     if (!isLoggedin) return;
-    if (newComment.trim() === "") return;
-    if (!_id) return;
     try {
       if (!_id) return;
+      const resultAction = await dispatch(setuserLike(_id));
+      if (setuserLike.fulfilled.match(resultAction)) {
+        const likedUsers = resultAction.payload;
+        setlikes(likedUsers.length);
+        const liked = likedUsers.some((like) => like.likeBy.includes(user._id));
+        setIsLiked(liked);
+      }
+      toast.success("Like successfully", { autoClose: 2000 })
+    } catch (error) {
+      console.log(error);
+
+    }
+  };
+
+  // Handle subscription
+  const handleSubscription = async (id) => {
+    if (!id || !user || !isLoggedin) return;
+    const resultAction = await dispatch(userSubscribeTochannel(id));
+    if (userSubscribeTochannel.fulfilled.match(resultAction)) {
+      const subscribedUsers = resultAction.payload;
+      const subscribed = subscribedUsers.some((u) => u.includes(user._id));
+      setIsSubscribed(subscribed);
+    }
+  };
+
+  // Handle comment
+  const handleAddComment = async () => {
+    if (!isLoggedin || newComment.trim() === "" || !_id) return;
+    try {
       setLoading(true);
       await dispatch(addAsyncComment({ _id, newComment }));
     } catch (error) {
@@ -206,72 +178,59 @@ function Videoplayer({
       setLoading(false);
       setNewComment("");
     }
-
-
   };
 
-
+  // Fetch video likes
   useEffect(() => {
     const fetchVideoLike = async () => {
+      if (!user || !_id) return;
       try {
-        if (!user) return;
-        if (!_id) return;
         const res = await dispatch(getVideoLikes(_id));
         if (getVideoLikes.fulfilled.match(res)) {
-          const loggedInUser = res.payload;
-          if (loggedInUser.length > 0) {
-            setlikes(loggedInUser.length);
-            loggedInUser.map((like) => {
-              const liked = like.likeBy.includes(user._id)
-              if (liked) {
-                setIsLiked(true);
-              } else {
-                setIsLiked(false)
-              }
-            })
-          }
-
+          const likedData = res.payload;
+          setlikes(likedData.length);
+          const liked = likedData.some((like) => like.likeBy.includes(user._id));
+          setIsLiked(liked);
         }
-
       } catch (error) {
         console.log(error);
-
       } finally {
         setLoading(false);
       }
-    }
-    fetchVideoLike()
-  }, [dispatch, user, _id])
-
+    };
+    fetchVideoLike();
+  }, [dispatch, user, _id]);
 
   const date = new Date(createdAt);
 
-
   return (
-    <div className="text-gray-900 dark:text-white min-h-screen flex flex-col lg:flex-row gap-6 p-4">
+    <div className="text-gray-900 dark:text-white min-h-screen flex flex-col lg:flex-row gap-6 ">
       {/* Video Section */}
       <div className="flex-1">
-        <div className="w-full aspect-video rounded-lg overflow-hidden">
-          <video src={videoFile} controls
-            autoPlay
-            muted={false}
-            loop
-            volume={1.0} />
+        <div className="w-full sm:w-[1000px] h-[33vh] sm:h-[450px] rounded-xl overflow-hidden bg-black shadow-lg ">
+          <video
+            src={videoFile}
+            controls
+            className="w-full h-full object-cover rounded-xl bg-black"
+          />
         </div>
+
 
         {/* Video Info */}
         <div className="flex justify-between items-center mt-2 mb-2">
-          <div className="flex-1 ">
-            <h1 className="text sm:text-xl font-bold mt-3">{title}</h1>
-            <div className="text-sm text-gray-700 dark:text-gray-300 sm:gap-[2px]  flex-1 sm:flex">
-              <p>{views} views • {"  "}</p>
-              <p>{date.toLocaleString("en-US", {
-                month: "long",
-                year: "numeric",
-              })}</p>
+          <div className="flex-1">
+            <h1 className="text-sm sm:text-xl font-bold mt-3">{title}</h1>
+            <div className="text-sm text-gray-700 dark:text-gray-300 flex gap-2">
+              <p>{views} views</p>
+              <p>
+                {date.toLocaleString("en-US", {
+                  month: "long",
+                  year: "numeric",
+                })}
+              </p>
             </div>
           </div>
-          <div className="relative">
+          <div>
             {!isSubscribed ? (
               <button
                 className="px-4 py-2 bg-red-600 hover:bg-red-700 font-semibold text-white rounded-full"
@@ -280,49 +239,39 @@ function Videoplayer({
                 Subscribe
               </button>
             ) : (
-              <div>
-                <button
-                  className="px-4 py-2 bg-gray-700 hover:bg-gray-800 font-semibold text-white rounded-full"
-                  onClick={() => handleSubscription(owner)}
-                >
-                  Subscribed
-                </button>
-              </div>
+              <button
+                className="px-4 py-2 bg-gray-700 hover:bg-gray-800 font-semibold text-white rounded-full"
+                onClick={() => handleSubscription(owner)}
+              >
+                Subscribed
+              </button>
             )}
           </div>
         </div>
 
         {/* Actions */}
-        <div className="flex-1 flex-wrap md:flex justify-between items-center gap-4 mt-3">
-          <div className="flex justify-start items-center gap-4">
-            <div className="h-14 w-14">
-              <img
-                src={
-                  ownerData?.avatar ||
-                  "https://via.placeholder.com/36x36.png?text=U"
-                }
-                alt="Channel avatar"
-                className="w-12 h-12 rounded-full object-cover"
-              />
-            </div>
+        <div className="flex flex-wrap md:flex justify-between items-center gap-4 mt-3">
+          <div className="flex items-center gap-4">
+            <img
+              src={ownerData?.avatar || "https://via.placeholder.com/36x36.png?text=U"}
+              alt="Channel avatar"
+              className="w-12 h-12 rounded-full object-cover"
+            />
             <div>
               <div>{ownerData?.username || "Channel name"}</div>
               <div className="text-[12px]">{subscribeCount} Subscribers</div>
             </div>
           </div>
+
           <div className="flex gap-2 mt-4 md:mt-0">
             <button
               className="flex items-center gap-1 px-6 py-2 bg-gray-300 dark:bg-gray-900 rounded-full hover:bg-gray-400 dark:hover:bg-gray-700"
               onClick={handleLike}
             >
-              <span
-                className={`${isLiked ? "text-blue-600" : "text-gray-500"
-                  } text-[1.2rem]`}
-              >
-                <AiFillLike />
-              </span>{" "}
+              <AiFillLike className={`${isLiked ? "text-blue-600" : "text-gray-500"} text-[1.2rem]`} />
               {likes}
             </button>
+
             <button
               onClick={() => setShowShare(true)}
               className="flex items-center gap-1 px-5 py-2 bg-gray-300 dark:bg-gray-900 rounded-full hover:bg-gray-400 dark:hover:bg-gray-700"
@@ -347,30 +296,28 @@ function Videoplayer({
           )}
         </div>
 
-        {/* ✅ Comment Section */}
+        {/* Comment Section */}
         <div className="mt-6">
           <h2 className="text-lg font-semibold mb-3">
             Comments ({videoComment?.length || 0})
           </h2>
 
-          {/* Input */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mb-4">
+          <div className="flex flex-col sm:flex-row items-center gap-2 mb-4">
             <input
               type="text"
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Add a comment..."
-              className="flex-1 px-3 py-2 rounded-lg border dark:border-gray-700 dark:bg-gray-900 outline-none  mr-3 sm:mr-0"
+              className="flex-1 px-3 py-2 rounded-lg border dark:border-gray-700 dark:bg-gray-900 outline-none"
             />
             <button
               onClick={handleAddComment}
-              className="px-4 py-2 text-center bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
             >
               Post
             </button>
           </div>
 
-          {/* List */}
           <div className="space-y-3">
             {commentLoading ? (
               <Loader />
@@ -389,13 +336,7 @@ function Videoplayer({
       <div className="w-full lg:w-80 space-y-4">
         <h2 className="font-semibold mb-2">Suggested Videos</h2>
         <div className="space-y-2">
-          {loading ? (
-            <Loader />
-          ) : (
-            videos?.map((video) => (
-              <SuggestedVideo key={video._id} video={video} />
-            ))
-          )}
+          {loading ? <Loader /> : videos?.map((video) => <SuggestedVideo key={video._id} video={video} />)}
         </div>
       </div>
     </div>

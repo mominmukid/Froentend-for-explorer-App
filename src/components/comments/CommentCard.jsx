@@ -25,14 +25,7 @@ function CommentCard({ comment: { content, createdAt, _id, owner, likes = [] } }
       ? JSON.parse(localStorage.getItem("user"))
       : null;
 
-   useEffect(() => {
-      const cookie = document.cookie.split("=")
-      if (cookie[0] == "isLoggedin" && cookie[1] == 'true') {
-         setIsLoggedin(true);
-      } else {
-         setIsLoggedin(false);
-      }
-   }, [])
+
 
    useEffect(() => {
       const getuserDitails = async (ownerId) => {
@@ -57,7 +50,10 @@ function CommentCard({ comment: { content, createdAt, _id, owner, likes = [] } }
       if (user && likes?.includes(user._id)) {
          setIsLiked(true);
       }
-   }, [likes, user]);
+      if (user) {
+         setIsLoggedin(true);
+      }
+   }, [dispatch]);
 
    const handleDelete = async () => {
       try {
@@ -155,7 +151,7 @@ function CommentCard({ comment: { content, createdAt, _id, owner, likes = [] } }
          }
       }
       fetchCommentLike()
-   }, [dispatch, user, _id])
+   }, [dispatch])
 
 
 

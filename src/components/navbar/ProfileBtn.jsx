@@ -80,7 +80,7 @@ function ProfileBtn({ isblock, setIsblock }) {
 
         <NavLink
           to="/login"
-          className={` ${!localUser ? "block" : "hidden"}w-full pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer`}
+          className={` ${!localUser ? "block" : "hidden"} w-full pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer`}
           onClick={() => setIsblock(false)}
         >
           <span className="text-[23px] font-extrabold">

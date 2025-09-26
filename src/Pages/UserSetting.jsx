@@ -1,18 +1,33 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getUser, updateUserAvatar, updateUserBanner, updateUserFullname } from "../store/UserSlice";
+import {
+  getUser,
+  updateUserAvatar,
+  updateUserBanner,
+  updateUserFullname,
+} from "../store/UserSlice";
+import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import { Toast } from "primereact/toast";
 
 function SettingsPage() {
   const reduxUser = useSelector(getUser);
   const [localUser, setLocalUser] = useState(null);
   const dispatch = useDispatch();
+  const toast = useRef(null);
 
-  const [banner, setBanner] = useState("https://source.unsplash.com/random/1600x400/?nature");
+  const [banner, setBanner] = useState(
+    "https://source.unsplash.com/random/1600x400/?nature"
+  );
   const [avatar, setAvatar] = useState("https://i.pravatar.cc/150?img=5");
   const [fullname, setFullname] = useState("John Doe");
 
   const [bannerFile, setBannerFile] = useState(null);
   const [avatarFile, setAvatarFile] = useState(null);
+
+  // Loading states
+  const [loadingAvatar, setLoadingAvatar] = useState(false);
+  const [loadingBanner, setLoadingBanner] = useState(false);
+  const [loadingName, setLoadingName] = useState(false);
 
   // Load user from localStorage on mount
   useEffect(() => {
@@ -30,75 +45,172 @@ function SettingsPage() {
     if (user.coverImage) setBanner(user.coverImage);
   }, [user]);
 
+  // ✅ Confirm box wrapper
+  const showConfirm = (message, onAccept) => {
+    confirmDialog({
+      message: (
+        <div className="text-center text-gray-800 dark:text-gray-200">
+          {message}
+        </div>
+      ),
+      header: (
+        <div className="font-bold text-lg text-gray-900 dark:text-gray-100">
+          Confirmation
+        </div>
+      ),
+      icon: "pi pi-exclamation-triangle text-yellow-500 mr-2 text-xl",
+      accept: onAccept,
+      rejectClassName:
+        "px-4 py-2 rounded-lg bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-400 transition",
+      acceptClassName:
+        "px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition",
+      className:
+        "rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6 w-[90%] sm:w-[400px]",
+      footerClassName: "flex justify-between px-4 pt-4",
+    });
+  };
+
   // Handle Avatar Update
-  const handleAvatarUpdate = async () => {
-    if (!avatarFile) return alert("Please select a new avatar first!");
-    const confirmed = window.confirm("Are you sure you want to update your avatar?");
-    if (!confirmed) return;
+  const handleAvatarUpdate = () => {
+    if (!avatarFile)
+      return toast.current.show({
+        severity: "warn",
+        summary: "Warning",
+        detail: "Please select a new avatar first!",
+      });
 
-    try {
-      const resultAction = await dispatch(updateUserAvatar(avatarFile));
+    showConfirm("Are you sure you want to update your avatar?", async () => {
+      try {
+        setLoadingAvatar(true);
+        toast.current.show({
+          severity: "info",
+          summary: "Uploading...",
+          detail: "Updating avatar...",
+        });
 
-      if (updateUserAvatar.fulfilled.match(resultAction)) {
-        const updatedUser = resultAction.payload; // <- this is the updated user object
-        localStorage.setItem("user", JSON.stringify(updatedUser)); // save updated user
-        window.location.reload();
-      } else {
-        throw new Error("Update action was not fulfilled");
+        const resultAction = await dispatch(updateUserAvatar(avatarFile));
+        if (updateUserAvatar.fulfilled.match(resultAction)) {
+          const updatedUser = resultAction.payload;
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+
+          toast.current.show({
+            severity: "success",
+            summary: "Success",
+            detail: "Avatar updated successfully!",
+          });
+
+          setTimeout(() => window.location.reload(), 1000);
+        } else {
+          throw new Error("Update action was not fulfilled");
+        }
+      } catch (error) {
+        console.error(error);
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "Failed to update avatar. Try again.",
+        });
+      } finally {
+        setLoadingAvatar(false);
       }
-    } catch (error) {
-      console.error(error);
-      alert("Failed to update avatar. Try again."); // failure alert
-    }
+    });
   };
 
-  const handleBannerUpdate = async () => {
-    if (!bannerFile) return alert("Please select a new Banner first!");
-    const confirmed = window.confirm("Are you sure you want to update your Banner?");
-    if (!confirmed) return;
+  // Handle Banner Update
+  const handleBannerUpdate = () => {
+    if (!bannerFile)
+      return toast.current.show({
+        severity: "warn",
+        summary: "Warning",
+        detail: "Please select a new banner first!",
+      });
 
-    try {
-      const resultAction = await dispatch(updateUserBanner(bannerFile));
+    showConfirm("Are you sure you want to update your banner?", async () => {
+      try {
+        setLoadingBanner(true);
+        toast.current.show({
+          severity: "info",
+          summary: "Uploading...",
+          detail: "Updating banner...",
+        });
 
-      if (updateUserBanner.fulfilled.match(resultAction)) {
-        const updatedUser = resultAction.payload; // <- this is the updated user object
-        localStorage.setItem("user", JSON.stringify(updatedUser)); // save updated user
-        window.location.reload();
-      } else {
-        throw new Error("Update action was not fulfilled");
+        const resultAction = await dispatch(updateUserBanner(bannerFile));
+        if (updateUserBanner.fulfilled.match(resultAction)) {
+          const updatedUser = resultAction.payload;
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+
+          toast.current.show({
+            severity: "success",
+            summary: "Success",
+            detail: "Banner updated successfully!",
+          });
+
+          setTimeout(() => window.location.reload(), 1000);
+        } else {
+          throw new Error("Update action was not fulfilled");
+        }
+      } catch (error) {
+        console.error(error);
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "Failed to update banner. Try again.",
+        });
+      } finally {
+        setLoadingBanner(false);
       }
-    } catch (error) {
-      console.error(error);
-      alert("Failed to update Banner. Try again."); // failure alert
-    }
+    });
   };
-
 
   // Handle Fullname Update
-  const handleFullnameUpdate = async () => {
-    if (!fullname.trim()) return alert("Fullname cannot be empty!");
-    const confirmed = window.confirm("Are you sure you want to update your fullname?");
-    if (!confirmed) return;
+  const handleFullnameUpdate = () => {
+    if (!fullname.trim())
+      return toast.current.show({
+        severity: "warn",
+        summary: "Warning",
+        detail: "Fullname cannot be empty!",
+      });
 
-    try {
-      const resultAction = await dispatch(updateUserFullname(fullname.trim()));
+    showConfirm("Are you sure you want to update your fullname?", async () => {
+      try {
+        setLoadingName(true);
+        toast.current.show({
+          severity: "info",
+          summary: "Uploading...",
+          detail: "Updating fullname...",
+        });
 
-      if (updateUserFullname.fulfilled.match(resultAction)) {
-        const updatedUser = resultAction.payload; // <- this is the updated user object
-        localStorage.setItem("user", JSON.stringify(updatedUser)); // save updated user
-        window.location.reload();
-      } else {
-        throw new Error("Update action was not fulfilled");
+        const resultAction = await dispatch(updateUserFullname(fullname.trim()));
+        if (updateUserFullname.fulfilled.match(resultAction)) {
+          const updatedUser = resultAction.payload;
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+
+          toast.current.show({
+            severity: "success",
+            summary: "Success",
+            detail: "Fullname updated successfully!",
+          });
+
+          setTimeout(() => window.location.reload(), 1000);
+        } else {
+          throw new Error("Update action was not fulfilled");
+        }
+      } catch (error) {
+        console.error(error);
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "Failed to update fullname. Try again.",
+        });
+      } finally {
+        setLoadingName(false);
       }
-    } catch (error) {
-      console.error(error);
-      alert("Failed to update fullname. Try again."); // failure alert
-    }
+    });
   };
 
   return (
-    <div className="min-h-screen   text-gray-900 dark:text-gray-200 p-4 sm:p-8">
-      <div className="max-w-4xl mx-auto rounded-xl shadow-lg p-6 sm:p-10 ">
+    <div className="min-h-screen text-gray-900 dark:text-gray-200 p-4 sm:p-8">
+      <div className="max-w-4xl mx-auto rounded-xl shadow-lg p-6 sm:p-10">
         <h1 className="text-2xl font-bold mb-6">Profile Settings</h1>
 
         {/* Banner Upload */}
@@ -113,23 +225,32 @@ function SettingsPage() {
                 const file = e.target.files[0];
                 if (!file) return;
                 setBanner(URL.createObjectURL(file));
-                setBannerFile(file); // store actual File for backend
+                setBannerFile(file);
               }}
               className="absolute inset-0 opacity-0 cursor-pointer"
             />
           </div>
           <button
             onClick={handleBannerUpdate}
-            className="mt-2 px-4 py-1 bg-blue-600 cursor-pointer text-white rounded-lg hover:bg-blue-700"
+            disabled={loadingBanner}
+            className={`mt-2 px-4 py-1 rounded-lg text-white ${
+              loadingBanner
+                ? "bg-gray-500 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
           >
-            Update Banner
+            {loadingBanner ? "Uploading..." : "Update Banner"}
           </button>
         </div>
 
         {/* Avatar Upload */}
         <div className="mb-6 flex-1 items-center gap-4">
           <div className="relative">
-            <img src={avatar} alt="Avatar" className="w-24 h-24 rounded-full border-4 border-white dark:border-gray-800 shadow-md object-cover" />
+            <img
+              src={avatar}
+              alt="Avatar"
+              className="w-24 h-24 rounded-full border-4 border-white dark:border-gray-800 shadow-md object-cover"
+            />
             <input
               type="file"
               accept="image/*"
@@ -137,16 +258,21 @@ function SettingsPage() {
                 const file = e.target.files[0];
                 if (!file) return;
                 setAvatar(URL.createObjectURL(file));
-                setAvatarFile(file); // store actual File for backend
+                setAvatarFile(file);
               }}
               className="absolute inset-0 opacity-0 cursor-pointer rounded-full"
             />
           </div>
           <button
             onClick={handleAvatarUpdate}
-            className="px-4 py-1 bg-blue-600 cursor-pointer text-white rounded-lg hover:bg-blue-700"
+            disabled={loadingAvatar}
+            className={`px-4 py-1 rounded-lg text-white ${
+              loadingAvatar
+                ? "bg-gray-500 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
           >
-            Update Avatar
+            {loadingAvatar ? "Uploading..." : "Update Avatar"}
           </button>
         </div>
 
@@ -162,13 +288,23 @@ function SettingsPage() {
             />
             <button
               onClick={handleFullnameUpdate}
-              className="px-4 py-1 cursor-pointer bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              disabled={loadingName}
+              className={`px-4 py-1 rounded-lg text-white ${
+                loadingName
+                  ? "bg-gray-500 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700"
+              }`}
             >
-              Update Name
+              {loadingName ? "Uploading..." : "Update Name"}
             </button>
           </div>
         </div>
       </div>
+
+      {/* Global Confirm Dialog */}
+      <ConfirmDialog />
+      {/* Global Toast */}
+      <Toast ref={toast} position="top-right" />
     </div>
   );
 }
