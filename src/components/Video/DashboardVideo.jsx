@@ -50,7 +50,9 @@ function DashboardVideo({ video, setTotalViews, handleDeleteVideo }) {
               ),
             });
           }
-        } catch (error) {
+        } catch (e) {
+          console.log(e);
+          
           toast.current.show({
             severity: "error",
             summary: "Error",

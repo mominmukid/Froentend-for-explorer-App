@@ -51,7 +51,6 @@ function Videoplayer({
     useSelector(getAllComments)
   );
   const [commentLoading, setCommentLoading] = useState(false);
-  const [videoUrl, setVideoUrl] = useState(videoFile);
 
   // useEffect(() => {
   //   setVideoUrl(videoFile)
@@ -253,8 +252,8 @@ function Videoplayer({
         <div className="flex flex-wrap md:flex justify-between items-center gap-4 mt-3">
           <div className="flex items-center gap-4">
             <img
-              src={ownerData?.avatar || "https://via.placeholder.com/36x36.png?text=U"}
-              alt="Channel avatar"
+              src={ownerData?.avatar || "public/Images/profile.png"}
+              alt="public/Images/profile.png"
               className="w-12 h-12 rounded-full object-cover"
             />
             <div>
@@ -302,13 +301,13 @@ function Videoplayer({
             Comments ({videoComment?.length || 0})
           </h2>
 
-          <div className="flex flex-col sm:flex-row items-center gap-2 mb-4">
+          <div className="flex  sm:flex-row items-center gap-2 mb-4">
             <input
               type="text"
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Add a comment..."
-              className="flex-1 px-3 py-2 rounded-lg border dark:border-gray-700 dark:bg-gray-900 outline-none"
+              className="flex-1 px-3 py-2 rounded-lg border dark:border-gray-700 min-w-40 dark:bg-gray-900 outline-none"
             />
             <button
               onClick={handleAddComment}

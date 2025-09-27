@@ -66,9 +66,9 @@ function VideoCard({ video: { _id, title, thumbnail, duration, views, createdAt,
                 <img
                     src={
                         user?.avatar ||
-                        "https://via.placeholder.com/36x36.png?text=U" // fallback
+                        "public/Images/profile.png" // fallback
                     }
-                    alt="Channel avatar"
+                    alt="public/Images/profile.png"
                     // Adjusted size for responsiveness: w-10/h-10 on small, w-12/h-12 on medium/larger
                     className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover flex-shrink-0"
                 />

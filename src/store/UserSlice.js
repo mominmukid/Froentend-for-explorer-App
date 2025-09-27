@@ -268,6 +268,31 @@ export const logoutUser = createAsyncThunk(
   }
 );
 
+export const updateUserPassword = createAsyncThunk(
+  "update/user/Password",
+  async ({ newPassword, oldPassword }, { rejectWithValue }) => {
+    console.log(newPassword,oldPassword);
+    
+    try {
+      await axios.post(
+        `${baseUrl}/users/change-password`,
+        { newPassword, oldPassword },
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      return;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to update fullname"
+      );
+    }
+  }
+);
+
 // Slice
 const userSclice = createSlice({
   name: "user",

@@ -127,17 +127,15 @@ const Signup = () => {
         {/* Logo */}
         <div className="text-center mb-8">
           <NavLink to="/" className="inline-flex items-center gap-2 mb-4">
-            <span className="rounded-full flex items-center justify-center text-red-500 text-2xl mt-2 ml-[-3rem] font-bold">
-              <FaRegCirclePlay />
+            <span className="rounded-full flex items-center justify-center text-red-500 text-2xl  ml-[-3rem] font-bold">
+              <img src="public/Images/logo.png" alt="public/Images/logo.png" className='w-8 h-8 mt-[-12px]'  />
             </span>
-            <span className="text-2xl font-bold dark:text-gray-300 text-gray-700">
-              TubeClone
-            </span>
+           <span className="text-2xl font-bold font-serif italic">Wideview</span>
           </NavLink>
           <h1 className="text-3xl font-bold text-gray-700 dark:text-gray-300 mb-2">
             Create account
           </h1>
-          <p className="dark:text-gray-300 text-gray-700">Join TubeClone today</p>
+          <p className="dark:text-gray-300 text-gray-700">Join Wideview today</p>
         </div>
 
         {/* Signup Form */}

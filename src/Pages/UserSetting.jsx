@@ -5,6 +5,7 @@ import {
   updateUserAvatar,
   updateUserBanner,
   updateUserFullname,
+  updateUserPassword,
 } from "../store/UserSlice";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { Toast } from "primereact/toast";
@@ -28,6 +29,11 @@ function SettingsPage() {
   const [loadingAvatar, setLoadingAvatar] = useState(false);
   const [loadingBanner, setLoadingBanner] = useState(false);
   const [loadingName, setLoadingName] = useState(false);
+  const [loadingPassword, setLoadingPassword] = useState(false);
+
+  // Password state
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
 
   // Load user from localStorage on mount
   useEffect(() => {
@@ -70,7 +76,7 @@ function SettingsPage() {
     });
   };
 
-  // Toast helper with background colors
+  // Toast helper
   const showToast = (severity, summary, detail) => {
     const severityStyles = {
       info: "bg-blue-600 text-white",
@@ -85,7 +91,7 @@ function SettingsPage() {
       life: 2500,
       content: (
         <div
-          className={`p-4 rounded-lg shadow-md ${severityStyles[severity]} flex flex-col`}
+          className={`px-10 py-4 mb-5 w-72 rounded-lg shadow-md ${severityStyles[severity]} flex flex-col flex-wrap`}
         >
           <span className="font-bold">{summary}</span>
           <span className="text-sm">{detail}</span>
@@ -97,7 +103,6 @@ function SettingsPage() {
   // Handle Avatar Update
   const handleAvatarUpdate = () => {
     if (!avatarFile) return showToast("warn", "Warning", "Please select a new avatar first!");
-
     showConfirm("Are you sure you want to update your avatar?", async () => {
       try {
         setLoadingAvatar(true);
@@ -125,7 +130,6 @@ function SettingsPage() {
   // Handle Banner Update
   const handleBannerUpdate = () => {
     if (!bannerFile) return showToast("warn", "Warning", "Please select a new banner first!");
-
     showConfirm("Are you sure you want to update your banner?", async () => {
       try {
         setLoadingBanner(true);
@@ -153,7 +157,6 @@ function SettingsPage() {
   // Handle Fullname Update
   const handleFullnameUpdate = () => {
     if (!fullname.trim()) return showToast("warn", "Warning", "Fullname cannot be empty!");
-
     showConfirm("Are you sure you want to update your fullname?", async () => {
       try {
         setLoadingName(true);
@@ -178,9 +181,37 @@ function SettingsPage() {
     });
   };
 
+
+
+  // Handle Password Update
+  const handlePasswordUpdate = () => {
+    if (!oldPassword || !newPassword) {
+      return showToast("warn", "Warning", "Both fields are required!");
+    }
+    showConfirm("Are you sure you want to change your password?", async () => {
+      try {
+        setLoadingPassword(true);
+        showToast("info", "Processing...", "Updating password...");
+
+        // await updatePasswordAPI(oldPassword, newPassword);
+        const resultAction = await dispatch(updateUserPassword({ newPassword, oldPassword }));
+        if (updateUserPassword.fulfilled.match(resultAction)) {
+          showToast("success", "Success", "Password updated successfully!");
+          setOldPassword("");
+          setNewPassword("");
+        }
+      } catch (error) {
+        console.error(error);
+        showToast("error", "Error", "Failed to update password. Try again.");
+      } finally {
+        setLoadingPassword(false);
+      }
+    });
+  };
+
   return (
     <div className="min-h-screen text-gray-900 dark:text-gray-200 p-4 sm:p-8">
-      <div className="max-w-4xl mx-auto rounded-xl shadow-lg p-6 sm:p-10 bg-white dark:bg-gray-800">
+      <div className="max-w-7xl sm:max-w-3xl mx-auto rounded-xl p-1 sm:p-10 ">
         <h1 className="text-2xl font-bold mb-6">Profile Settings</h1>
 
         {/* Banner Upload */}
@@ -204,8 +235,8 @@ function SettingsPage() {
             onClick={handleBannerUpdate}
             disabled={loadingBanner}
             className={`mt-2 px-4 py-1 rounded-lg text-white ${loadingBanner
-                ? "bg-gray-500 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
+              ? "bg-gray-500 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
               }`}
           >
             {loadingBanner ? "Uploading..." : "Update Banner"}
@@ -213,7 +244,7 @@ function SettingsPage() {
         </div>
 
         {/* Avatar Upload */}
-        <div className="mb-6 flex items-center gap-4">
+        <div className="mb-6 flex-1 gap-1 items-center gap-4">
           <div className="relative">
             <img
               src={avatar}
@@ -236,8 +267,8 @@ function SettingsPage() {
             onClick={handleAvatarUpdate}
             disabled={loadingAvatar}
             className={`px-4 py-1 rounded-lg text-white ${loadingAvatar
-                ? "bg-gray-500 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
+              ? "bg-gray-500 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
               }`}
           >
             {loadingAvatar ? "Uploading..." : "Update Avatar"}
@@ -252,17 +283,48 @@ function SettingsPage() {
               type="text"
               value={fullname}
               onChange={(e) => setFullname(e.target.value)}
-              className="flex-1 rounded-lg border border-gray-300 dark:border-gray-700 shadow-sm px-4 py-2 dark:bg-gray-800"
+              className="flex-1 rounded-lg border border-gray-300 dark:border-gray-700 shadow-sm px-4 py-2 dark:bg-gray-800 min-w-40"
             />
             <button
               onClick={handleFullnameUpdate}
               disabled={loadingName}
               className={`px-4 py-1 rounded-lg text-white ${loadingName
-                  ? "bg-gray-500 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700"
+                ? "bg-gray-500 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
                 }`}
             >
               {loadingName ? "Uploading..." : "Update Name"}
+            </button>
+          </div>
+        </div>
+
+        {/* Change Password */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium mb-2">Change Password</label>
+          <div className="flex flex-col gap-2">
+            <input
+              type="password"
+              placeholder="Old Password"
+              value={oldPassword}
+              onChange={(e) => setOldPassword(e.target.value)}
+              className="rounded-lg border border-gray-300 dark:border-gray-700 shadow-sm px-4 py-2 dark:bg-gray-800"
+            />
+            <input
+              type="password"
+              placeholder="New Password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="rounded-lg border border-gray-300 dark:border-gray-700 shadow-sm px-4 py-2 dark:bg-gray-800"
+            />
+            <button
+              onClick={handlePasswordUpdate}
+              disabled={loadingPassword}
+              className={`px-4 py-1 rounded-lg text-white ${loadingPassword
+                ? "bg-gray-500 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+                }`}
+            >
+              {loadingPassword ? "Updating..." : "Update Password"}
             </button>
           </div>
         </div>

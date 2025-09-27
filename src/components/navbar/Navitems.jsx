@@ -52,10 +52,10 @@ function Navitems({ handelList, handleIsBlock }) {
             </div>
 
             {/* Logo */}
-            <NavLink to="/" className='text-3xl md:text-2xl font-bold text-red-600'>
-               <FaRegCirclePlay />
+            <NavLink to="/" className='text-3xl md:text-2xl font-bold text-red-600 w-10 h-10'>
+               <img src="public/Images/logo.png" alt="public/Images/logo.png" className='w-full h-full' />
             </NavLink>
-            <span className='font-bold text-xl text-black hidden md:block dark:text-white'>VideoTube</span>
+            <span className='font-bold text-xl text-black hidden md:block dark:text-white font-serif italic'>Wideview</span>
          </div>
 
          {/* Middle: Search bar */}

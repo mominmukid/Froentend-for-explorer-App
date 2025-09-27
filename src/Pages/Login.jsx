@@ -60,12 +60,12 @@ function Login() {
                   to="/"
                   className="inline-flex justify-start items-center ml-[-2.5rem] gap-2 mb-4"
                >
-                  <span className="text-red-500 text-2xl mt-1">
-                     <FaRegCirclePlay />
+                  <span className="text-red-500 text-2xl ">
+                    <img src="public/Images/logo.png" alt="public/Images/logo.png" className='w-8 h-8 mt-[-12px]'  />
                   </span>
-                  <span className="text-2xl font-bold">TubeClone</span>
+                  <span className="text-2xl font-bold font-serif italic">Wideview</span>
                </NavLink>
-               <h1 className="text-3xl font-bold mb-2">Welcome back</h1>
+               <h1 className="text-3xl font-bold mb-2 ">Welcome back</h1>
                <p className="text-gray-700 dark:text-gray-300">
                   Sign in to your account
                </p>
