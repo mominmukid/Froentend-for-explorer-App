@@ -22,7 +22,7 @@ import {
 } from "../../store/CommentSlice";
 import CommentCard from "../comments/CommentCard";
 import { getVideoLikes } from "../../store/likeSlice";
-import VideoPlayer from "../videojs/VideoPlayer";
+
 
 function Videoplayer({
   singleVideo: { _id, title, videoFile, description, views, createdAt, owner },
