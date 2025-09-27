@@ -69,8 +69,6 @@ export const fetchAsyncVideoSingle = createAsyncThunk(
   }
 );
 
-
-
 export const uploadVideo = createAsyncThunk(
   "upload/video",
   async (
@@ -125,8 +123,6 @@ export const updateVideo = createAsyncThunk(
   "update/user/video",
   async ({ id, video }, { rejectWithValue }) => {
     try {
-  
-
       // prepare multipart form-data
       const formData = new FormData();
       formData.append("video", video); // must match multer field name
@@ -152,8 +148,6 @@ export const updateThumnel = createAsyncThunk(
   "update/user/thumbnel",
   async ({ id, thumbnail }, { rejectWithValue }) => {
     try {
-      
-
       // prepare multipart form-data
       const formData = new FormData();
       formData.append("Thumbnel", thumbnail); // must match multer field name
@@ -202,7 +196,7 @@ export const updateVideoDetails = createAsyncThunk(
 
 export const setVideoViews = createAsyncThunk(
   "video/views",
-  async ( id , { rejectWithValue }) => {
+  async (id, { rejectWithValue }) => {
     try {
       // must match multer field name
       const response = await fetch(`${baseUrl}/videos/set-views/${id}`, {
@@ -216,6 +210,30 @@ export const setVideoViews = createAsyncThunk(
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to update video");
+      }
+      return;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const deleteVideo = createAsyncThunk(
+  "update/user/video-details",
+  async (id, { rejectWithValue }) => {
+    try {
+      // must match multer field name
+      const response = await fetch(`${baseUrl}/videos/deletevideo/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // send cookies
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to delete video");
       }
       return;
     } catch (error) {

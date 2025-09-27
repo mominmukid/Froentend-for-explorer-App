@@ -70,46 +70,52 @@ function SettingsPage() {
     });
   };
 
+  // Toast helper with background colors
+  const showToast = (severity, summary, detail) => {
+    const severityStyles = {
+      info: "bg-blue-600 text-white",
+      success: "bg-green-600 text-white",
+      warn: "bg-yellow-500 text-black",
+      error: "bg-red-600 text-white",
+    };
+    toast.current.show({
+      severity,
+      summary,
+      detail,
+      life: 2500,
+      content: (
+        <div
+          className={`p-4 rounded-lg shadow-md ${severityStyles[severity]} flex flex-col`}
+        >
+          <span className="font-bold">{summary}</span>
+          <span className="text-sm">{detail}</span>
+        </div>
+      ),
+    });
+  };
+
   // Handle Avatar Update
   const handleAvatarUpdate = () => {
-    if (!avatarFile)
-      return toast.current.show({
-        severity: "warn",
-        summary: "Warning",
-        detail: "Please select a new avatar first!",
-      });
+    if (!avatarFile) return showToast("warn", "Warning", "Please select a new avatar first!");
 
     showConfirm("Are you sure you want to update your avatar?", async () => {
       try {
         setLoadingAvatar(true);
-        toast.current.show({
-          severity: "info",
-          summary: "Uploading...",
-          detail: "Updating avatar...",
-        });
+        showToast("info", "Uploading...", "Updating avatar...");
 
         const resultAction = await dispatch(updateUserAvatar(avatarFile));
         if (updateUserAvatar.fulfilled.match(resultAction)) {
           const updatedUser = resultAction.payload;
           localStorage.setItem("user", JSON.stringify(updatedUser));
 
-          toast.current.show({
-            severity: "success",
-            summary: "Success",
-            detail: "Avatar updated successfully!",
-          });
-
+          showToast("success", "Success", "Avatar updated successfully!");
           setTimeout(() => window.location.reload(), 1000);
         } else {
           throw new Error("Update action was not fulfilled");
         }
       } catch (error) {
         console.error(error);
-        toast.current.show({
-          severity: "error",
-          summary: "Error",
-          detail: "Failed to update avatar. Try again.",
-        });
+        showToast("error", "Error", "Failed to update avatar. Try again.");
       } finally {
         setLoadingAvatar(false);
       }
@@ -118,44 +124,26 @@ function SettingsPage() {
 
   // Handle Banner Update
   const handleBannerUpdate = () => {
-    if (!bannerFile)
-      return toast.current.show({
-        severity: "warn",
-        summary: "Warning",
-        detail: "Please select a new banner first!",
-      });
+    if (!bannerFile) return showToast("warn", "Warning", "Please select a new banner first!");
 
     showConfirm("Are you sure you want to update your banner?", async () => {
       try {
         setLoadingBanner(true);
-        toast.current.show({
-          severity: "info",
-          summary: "Uploading...",
-          detail: "Updating banner...",
-        });
+        showToast("info", "Uploading...", "Updating banner...");
 
         const resultAction = await dispatch(updateUserBanner(bannerFile));
         if (updateUserBanner.fulfilled.match(resultAction)) {
           const updatedUser = resultAction.payload;
           localStorage.setItem("user", JSON.stringify(updatedUser));
 
-          toast.current.show({
-            severity: "success",
-            summary: "Success",
-            detail: "Banner updated successfully!",
-          });
-
+          showToast("success", "Success", "Banner updated successfully!");
           setTimeout(() => window.location.reload(), 1000);
         } else {
           throw new Error("Update action was not fulfilled");
         }
       } catch (error) {
         console.error(error);
-        toast.current.show({
-          severity: "error",
-          summary: "Error",
-          detail: "Failed to update banner. Try again.",
-        });
+        showToast("error", "Error", "Failed to update banner. Try again.");
       } finally {
         setLoadingBanner(false);
       }
@@ -164,44 +152,26 @@ function SettingsPage() {
 
   // Handle Fullname Update
   const handleFullnameUpdate = () => {
-    if (!fullname.trim())
-      return toast.current.show({
-        severity: "warn",
-        summary: "Warning",
-        detail: "Fullname cannot be empty!",
-      });
+    if (!fullname.trim()) return showToast("warn", "Warning", "Fullname cannot be empty!");
 
     showConfirm("Are you sure you want to update your fullname?", async () => {
       try {
         setLoadingName(true);
-        toast.current.show({
-          severity: "info",
-          summary: "Uploading...",
-          detail: "Updating fullname...",
-        });
+        showToast("info", "Uploading...", "Updating fullname...");
 
         const resultAction = await dispatch(updateUserFullname(fullname.trim()));
         if (updateUserFullname.fulfilled.match(resultAction)) {
           const updatedUser = resultAction.payload;
           localStorage.setItem("user", JSON.stringify(updatedUser));
 
-          toast.current.show({
-            severity: "success",
-            summary: "Success",
-            detail: "Fullname updated successfully!",
-          });
-
+          showToast("success", "Success", "Fullname updated successfully!");
           setTimeout(() => window.location.reload(), 1000);
         } else {
           throw new Error("Update action was not fulfilled");
         }
       } catch (error) {
         console.error(error);
-        toast.current.show({
-          severity: "error",
-          summary: "Error",
-          detail: "Failed to update fullname. Try again.",
-        });
+        showToast("error", "Error", "Failed to update fullname. Try again.");
       } finally {
         setLoadingName(false);
       }
@@ -210,7 +180,7 @@ function SettingsPage() {
 
   return (
     <div className="min-h-screen text-gray-900 dark:text-gray-200 p-4 sm:p-8">
-      <div className="max-w-4xl mx-auto rounded-xl shadow-lg p-6 sm:p-10">
+      <div className="max-w-4xl mx-auto rounded-xl shadow-lg p-6 sm:p-10 bg-white dark:bg-gray-800">
         <h1 className="text-2xl font-bold mb-6">Profile Settings</h1>
 
         {/* Banner Upload */}
@@ -233,18 +203,17 @@ function SettingsPage() {
           <button
             onClick={handleBannerUpdate}
             disabled={loadingBanner}
-            className={`mt-2 px-4 py-1 rounded-lg text-white ${
-              loadingBanner
+            className={`mt-2 px-4 py-1 rounded-lg text-white ${loadingBanner
                 ? "bg-gray-500 cursor-not-allowed"
                 : "bg-blue-600 hover:bg-blue-700"
-            }`}
+              }`}
           >
             {loadingBanner ? "Uploading..." : "Update Banner"}
           </button>
         </div>
 
         {/* Avatar Upload */}
-        <div className="mb-6 flex-1 items-center gap-4">
+        <div className="mb-6 flex items-center gap-4">
           <div className="relative">
             <img
               src={avatar}
@@ -266,11 +235,10 @@ function SettingsPage() {
           <button
             onClick={handleAvatarUpdate}
             disabled={loadingAvatar}
-            className={`px-4 py-1 rounded-lg text-white ${
-              loadingAvatar
+            className={`px-4 py-1 rounded-lg text-white ${loadingAvatar
                 ? "bg-gray-500 cursor-not-allowed"
                 : "bg-blue-600 hover:bg-blue-700"
-            }`}
+              }`}
           >
             {loadingAvatar ? "Uploading..." : "Update Avatar"}
           </button>
@@ -289,11 +257,10 @@ function SettingsPage() {
             <button
               onClick={handleFullnameUpdate}
               disabled={loadingName}
-              className={`px-4 py-1 rounded-lg text-white ${
-                loadingName
+              className={`px-4 py-1 rounded-lg text-white ${loadingName
                   ? "bg-gray-500 cursor-not-allowed"
                   : "bg-blue-600 hover:bg-blue-700"
-              }`}
+                }`}
             >
               {loadingName ? "Uploading..." : "Update Name"}
             </button>
