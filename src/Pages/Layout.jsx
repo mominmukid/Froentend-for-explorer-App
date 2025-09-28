@@ -21,7 +21,7 @@ import PlaylistCreate from "./PlaylistCreate";
 import PlaylistDetailsPage from "./Showplaylist";
 import Loder from "./Loader";
 import SubscriptionVideoPage from "../Pages/SubscriptionVideoPage";
-
+import AboutUs from "./AboutUs";
 // Components
 import Navbar from "../components/navbar/Navbar";
 import SideBox from "../components/navbar/Sidebox";
@@ -132,6 +132,7 @@ function Layout() {
                <Route path="/playlist/create" element={<PlaylistCreate />} />
                <Route path="/playlist/show" element={<PlaylistDetailsPage />} />
                <Route path="/loder" element={<Loder />} />
+               <Route path="/about" element={<AboutUs />} />
             </Routes>
          </div>
       </div>

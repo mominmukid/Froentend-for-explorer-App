@@ -38,10 +38,23 @@ function SettingsPage() {
   // Load user from localStorage on mount
   useEffect(() => {
     const userData = localStorage.getItem("user");
-    if (userData) setLocalUser(JSON.parse(userData));
+    if (userData) {
+      const data = JSON.parse(userData);
+      setLocalUser(data.user)
+
+    }
   }, []);
 
   const user = reduxUser?.user || localUser;
+
+  function saveUser(user) {
+    const now = new Date();
+    const item = {
+      user: user,
+      expiry: now.getTime() + 24 * 60 * 60 * 1000 // 1 day = 86400000 ms
+    };
+    localStorage.setItem("user", JSON.stringify(item));
+  }
 
   // Populate form fields when user data is ready
   useEffect(() => {
@@ -111,7 +124,7 @@ function SettingsPage() {
         const resultAction = await dispatch(updateUserAvatar(avatarFile));
         if (updateUserAvatar.fulfilled.match(resultAction)) {
           const updatedUser = resultAction.payload;
-          localStorage.setItem("user", JSON.stringify(updatedUser));
+          await saveUser(updatedUser);
 
           showToast("success", "Success", "Avatar updated successfully!");
           setTimeout(() => window.location.reload(), 1000);
@@ -138,7 +151,7 @@ function SettingsPage() {
         const resultAction = await dispatch(updateUserBanner(bannerFile));
         if (updateUserBanner.fulfilled.match(resultAction)) {
           const updatedUser = resultAction.payload;
-          localStorage.setItem("user", JSON.stringify(updatedUser));
+          await saveUser(updatedUser);
 
           showToast("success", "Success", "Banner updated successfully!");
           setTimeout(() => window.location.reload(), 1000);
@@ -165,7 +178,7 @@ function SettingsPage() {
         const resultAction = await dispatch(updateUserFullname(fullname.trim()));
         if (updateUserFullname.fulfilled.match(resultAction)) {
           const updatedUser = resultAction.payload;
-          localStorage.setItem("user", JSON.stringify(updatedUser));
+          await saveUser(updatedUser);
 
           showToast("success", "Success", "Fullname updated successfully!");
           setTimeout(() => window.location.reload(), 1000);
@@ -236,7 +249,7 @@ function SettingsPage() {
             disabled={loadingBanner}
             className={`mt-2 px-4 py-1 rounded-lg text-white ${loadingBanner
               ? "bg-gray-500 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700"
+              : "bg-gradient-to-r from-[#8b04a4] via-[#fd3243] to-[#e11755] hover:scale-102"
               }`}
           >
             {loadingBanner ? "Uploading..." : "Update Banner"}
@@ -244,7 +257,7 @@ function SettingsPage() {
         </div>
 
         {/* Avatar Upload */}
-        <div className="mb-6 flex-1 gap-1 items-center gap-4">
+        <div className="mb-6 flex-1  items-center gap-4">
           <div className="relative">
             <img
               src={avatar}
@@ -268,7 +281,7 @@ function SettingsPage() {
             disabled={loadingAvatar}
             className={`px-4 py-1 rounded-lg text-white ${loadingAvatar
               ? "bg-gray-500 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700"
+              : "bg-gradient-to-r from-[#8b04a4] via-[#fd3243] to-[#e11755] hover:scale-102"
               }`}
           >
             {loadingAvatar ? "Uploading..." : "Update Avatar"}
@@ -290,7 +303,7 @@ function SettingsPage() {
               disabled={loadingName}
               className={`px-4 py-1 rounded-lg text-white ${loadingName
                 ? "bg-gray-500 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
+                : "bg-gradient-to-r from-[#8b04a4] via-[#fd3243] to-[#e11755] hover:scale-102"
                 }`}
             >
               {loadingName ? "Uploading..." : "Update Name"}
@@ -321,7 +334,7 @@ function SettingsPage() {
               disabled={loadingPassword}
               className={`px-4 py-1 rounded-lg text-white ${loadingPassword
                 ? "bg-gray-500 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
+                : "bg-gradient-to-r from-[#8b04a4] via-[#fd3243] to-[#e11755] hover:scale-102"
                 }`}
             >
               {loadingPassword ? "Updating..." : "Update Password"}

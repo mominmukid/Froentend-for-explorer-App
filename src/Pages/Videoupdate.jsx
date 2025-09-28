@@ -133,7 +133,7 @@ function VideoUpdatePage() {
                      <button
                         onClick={handleVideoUpload}
                         disabled={videoUploading}
-                        className={`mt-2 w-full px-4 py-2 rounded-lg text-white ${videoUploading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
+                        className={`mt-2 w-full px-4 py-2 rounded-lg text-white ${videoUploading ? "bg-gray-400 cursor-not-allowed" : "bg-gradient-to-r from-[#8b04a4] via-[#fd3243] to-[#e11755] hover:scale-102"}`}
                      >
                         {videoUploading ? "Uploading..." : "Update Video"}
                      </button>
@@ -152,7 +152,7 @@ function VideoUpdatePage() {
                      <button
                         onClick={handleThumbnailUpload}
                         disabled={thumbnailUploading}
-                        className={`mt-2 w-full px-4 py-2 rounded-lg text-white ${thumbnailUploading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
+                        className={`mt-2 w-full px-4 py-2 rounded-lg text-white ${thumbnailUploading ? "bg-gray-400 cursor-not-allowed" : "bg-gradient-to-r from-[#8b04a4] via-[#fd3243] to-[#e11755] hover:scale-102"}`}
                      >
                         {thumbnailUploading ? "Uploading..." : "Update Thumbnail"}
                      </button>
@@ -175,7 +175,7 @@ function VideoUpdatePage() {
                      <button
                         onClick={handleDetailsUpdate}
                         disabled={detailsUpdating}
-                        className={`px-6 py-2 rounded-lg text-white shadow-md ${detailsUpdating ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
+                        className={`px-6 py-2 rounded-lg text-white shadow-md ${detailsUpdating ? "bg-gray-400 cursor-not-allowed" : "bg-gradient-to-r from-[#8b04a4] via-[#fd3243] to-[#e11755] hover:scale-102"}`}
                      >
                         {detailsUpdating ? "Updating..." : "Update Details"}
                      </button>

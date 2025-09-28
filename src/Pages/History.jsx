@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { MdDeleteForever } from "react-icons/md";
 import HistoryVideo from "../components/Video/HistoryVideo";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,18 +20,34 @@ function History() {
     isuserHistoryEmpty = true;
   }
 
-  const user = localStorage.getItem("user")
-    ? JSON.parse(localStorage.getItem("user"))
-    : null;
+  const [user, setuser] = useState({});
+
+
+  useEffect(() => {
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      const parsed = JSON.parse(userData);
+      if (parsed?.user) {
+        setuser(parsed.user);
+
+      } else {
+        setuser(null);
+
+      }
+    } else {
+      setuser(null);
+
+    }
+  }, [dispatch]);
 
   const getHistory = async () => {
-    if (!document.cookie && !user?._id) return;
+    if (!user?._id) return;
     dispatch(getUserHistory());
   };
 
   useEffect(() => {
     getHistory();
-  }, [user]);
+  }, [dispatch, user]);
 
   const handleClearHistory = async () => {
     const resultAction = await dispatch(clerWatchHistory());
@@ -89,7 +105,7 @@ function History() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div className="flex items-center gap-4">
             <button
-              className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-sm font-medium flex justify-center text-white items-center cursor-pointer"
+              className="bg-red-400 hover:bg-red-500 px-4 py-2 rounded-lg text-sm font-medium flex justify-center text-white items-center cursor-pointer opacity-100"
               onClick={confirmClearHistory}
             >
               <MdDeleteForever className="mr-1" />

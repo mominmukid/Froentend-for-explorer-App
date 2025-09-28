@@ -2,8 +2,9 @@ import { MdSavedSearch } from "react-icons/md";
 import { FaAudible } from "react-icons/fa";
 import { IoEarthOutline } from "react-icons/io5";
 import { PiSignInBold } from "react-icons/pi";
-import { FaInstagram } from "react-icons/fa6";
-import { FaXTwitter, FaDiscord } from "react-icons/fa6";
+import { FaLinkedin } from "react-icons/fa";
+import { VscGithub } from "react-icons/vsc";
+import { BsPersonVcard } from "react-icons/bs";
 import { MdArrowOutward } from "react-icons/md";
 import { RxCross1 } from "react-icons/rx";
 import { IoMdHome } from "react-icons/io";
@@ -38,10 +39,12 @@ function SideBox() {
       </div>
       {/* Bottom Icons */}
       <div className="w-full border-t-2 border-gray-100  p-3 flex justify-between items-center dark:border-[#181818]">
-        <p className="p-2 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-400/10 rounded-full cursor-pointer hover:bg-gray-300"><FaInstagram /></p>
-
-        <p className="p-2 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-400/10 rounded-full cursor-pointer hover:bg-gray-300"><FaXTwitter /></p>
-        <p className="p-2 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-400/10 rounded-full cursor-pointer hover:bg-gray-300"><FaDiscord /></p>
+        <a href="https://www.linkedin.com/in/mukid-momin" target="_blank">
+          <p className="p-2  dark:hover:text-white dark:hover:bg-gray-400/10 rounded-full cursor-pointer hover:bg-gray-300 text-blue-700 text-xl"><FaLinkedin /></p></a>
+        <a href="https://github.com/mominmukid " target="_blank">
+          <p className="p-2 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-400/10 rounded-full cursor-pointer hover:bg-gray-300 text-xl"><VscGithub /></p></a>
+          <a href="https://mukid-portfolio.netlify.app" target="_blank">
+        <p className="p-2  dark:hover:text-white dark:hover:bg-gray-400/10 rounded-full cursor-pointer hover:bg-gray-300 text-xl  text-[#1e9fab]"><BsPersonVcard /></p></a>
 
       </div>
     </div>

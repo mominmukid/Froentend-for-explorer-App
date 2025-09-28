@@ -21,7 +21,11 @@ function Dashboard() {
   // Load user from localStorage and set fallback cover
   useEffect(() => {
     const userData = localStorage.getItem("user");
-    if (userData) setLocalUser(JSON.parse(userData));
+    if (userData) {
+      const data = JSON.parse(userData);
+      setLocalUser(data.user)
+
+    }
     setFallbackCover("https://picsum.photos/1600/400");
   }, [reduxUser]);
   const user = reduxUser?.user || localUser;
@@ -131,7 +135,7 @@ function Dashboard() {
         {/* Action Buttons */}
         <div className="flex flex-wrap gap-4 mb-8">
           <button
-            className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-medium flex items-center gap-2 text-white"
+            className="bg-gradient-to-r from-[#8b04a4] via-[#fd3243] to-[#e11755] hover:scale-102 px-6 py-3 rounded-lg font-medium flex items-center gap-2 text-white"
             onClick={() => navigate('/upload')}
           >
             <MdCloudUpload />

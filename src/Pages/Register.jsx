@@ -27,6 +27,15 @@ const Signup = () => {
     mode: "onBlur",
   });
 
+  function saveUser(user) {
+    const now = new Date();
+    const item = {
+      user: user,
+      expiry: now.getTime() + 24 * 60 * 60 * 1000 // 1 day = 86400000 ms
+    };
+    localStorage.setItem("user", JSON.stringify(item));
+  }
+
   const password = watch("password");
 
   // register objects for file inputs so we can call the original handlers
@@ -45,28 +54,53 @@ const Signup = () => {
     };
   }, [avatarPreview, bannerPreview]);
 
+  function extractFirstLineError(htmlString) {
+    if (!htmlString) return "Unknown error";
+
+    // Extract <pre> content
+    const match = htmlString.match(/<pre>([\s\S]*?)<\/pre>/);
+    if (!match) return "Unknown error";
+
+    // Replace <br> and &nbsp;
+    const clean = match[1].replace(/<br\s*\/?>/gi, "\n").replace(/&nbsp;/g, " ");
+
+    // Take only the first line
+    return clean.split("\n")[0].trim();
+  }
+
   const onSubmit = async (formData) => {
     try {
       const resultAction = await dispatch(ragisterAsyncUser(formData));
 
       if (ragisterAsyncUser.fulfilled.match(resultAction)) {
         const ragisterUser = resultAction.payload;
-        localStorage.setItem("user", JSON.stringify(ragisterUser));
+        await saveUser(ragisterUser);
+
         toast.success("Registration successful", {
           position: "top-right",
           autoClose: 2000,
           theme: "dark",
         });
+
         navigate("/");
         window.location.reload();
       } else {
-        // Handle rejection where payload might contain an error message
-        const errorMessage = resultAction.error.message || "Registration failed";
-        throw new Error(errorMessage);
+        // Use payload if available, fallback to generic error
+        const errormsg = extractFirstLineError(resultAction.payload || resultAction.error.message)
+          || "Registration failed";
+
+
+        toast.error(errormsg, {
+          position: "top-right",
+          autoClose: 3000,
+          theme: "dark",
+        }); // → Error: User already existed ...
+
+        navigate("/register");
       }
     } catch (e) {
-      console.error(e.message);
-      toast.error(e.message === "Registration failed" ? "Registration failed. Please try again." : e.message, {
+      console.error(e);
+      toast.error("Something went wrong. Please try again.", {
         position: "top-right",
         autoClose: 2000,
         theme: "dark",
@@ -74,6 +108,9 @@ const Signup = () => {
       navigate("/register");
     }
   };
+
+
+
 
   /**
    * Custom handler for Avatar file input change.
@@ -128,9 +165,9 @@ const Signup = () => {
         <div className="text-center mb-8">
           <NavLink to="/" className="inline-flex items-center gap-2 mb-4">
             <span className="rounded-full flex items-center justify-center text-red-500 text-2xl  ml-[-3rem] font-bold">
-              <img src="public/Images/logo.png" alt="public/Images/logo.png" className='w-8 h-8 mt-[-12px]'  />
+              <img src="public/Images/logo.png" alt="public/Images/logo.png" className='w-8 h-8 mt-[-12px]' />
             </span>
-           <span className="text-2xl font-bold font-serif italic">Wideview</span>
+            <span className="text-2xl font-bold font-serif italic">Wideview</span>
           </NavLink>
           <h1 className="text-3xl font-bold text-gray-700 dark:text-gray-300 mb-2">
             Create account
@@ -318,7 +355,7 @@ const Signup = () => {
           {/* Submit */}
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 cursor-pointer px-4 rounded-lg transition-colors flex items-center justify-center"
+            className="w-full bg-gradient-to-r from-[#8b04a4] via-[#fd3243] to-[#e11755] hover:scale-102 text-white font-medium py-3 cursor-pointer px-4 rounded-lg transition-colors flex items-center justify-center"
             disabled={isSubmitting}
           >
             {isSubmitting ? (

@@ -116,7 +116,7 @@ function DashboardVideo({ video, setTotalViews, handleDeleteVideo }) {
               e.stopPropagation();
               navigate(`/video/update/${_id}`, { state: { _id } });
             }}
-            className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition"
+            className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition opacity-90"
           >
             Update
           </button>
@@ -126,7 +126,7 @@ function DashboardVideo({ video, setTotalViews, handleDeleteVideo }) {
               e.stopPropagation();
               confirmDelete(); // ✅ No navigation here
             }}
-            className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition"
+            className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition opacity-90"
           >
             Delete
           </button>

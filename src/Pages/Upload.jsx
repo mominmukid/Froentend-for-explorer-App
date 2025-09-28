@@ -211,7 +211,7 @@ const UploadPage = () => {
           <button
             type="submit"
             className={`w-full py-3 text-white font-medium rounded-lg transition-colors ${
-              isUploading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+              isUploading ? "bg-gray-400 cursor-not-allowed" : "bg-gradient-to-r from-[#8b04a4] via-[#fd3243] to-[#e11755] hover:scale-102"
             }`}
             disabled={isUploading}
           >

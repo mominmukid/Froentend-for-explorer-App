@@ -8,7 +8,7 @@ import { useDispatch } from "react-redux";
 import { deleteComment, updateComment } from "../../store/CommentSlice";
 import { toast } from "react-toastify";
 import { addAsyncCommentLike, fetchAsyncCommentLike } from '../../store/likeSlice'
-
+import LoginPopUp from '../loginpupUp/LoginPopUp'
 function CommentCard({ comment: { content, createdAt, _id, owner, likes = [] } }) {
    const timeofComment = timeAgo(createdAt);
    const [loading, setLoading] = useState(false);
@@ -19,12 +19,28 @@ function CommentCard({ comment: { content, createdAt, _id, owner, likes = [] } }
    const [isLiked, setIsLiked] = useState(false);
    const [likeCount, setLikeCount] = useState(likes?.length || 0);
    const [isLoggedin, setIsLoggedin] = useState(false)
-
+   const [user, setuser] = useState(null);
+   const [showLogin, setSetShowLogin] = useState(false);
    const dispatch = useDispatch();
-   const user = localStorage.getItem("user")
-      ? JSON.parse(localStorage.getItem("user"))
-      : null;
+   const [liked, setLikes] = useState([]);
 
+
+   useEffect(() => {
+      const userData = localStorage.getItem("user");
+      if (userData) {
+         const parsed = JSON.parse(userData);
+         if (parsed?.user) {
+            setuser(parsed.user);
+            setIsLoggedin(true);
+         } else {
+            setuser(null);
+            setIsLoggedin(false);
+         }
+      } else {
+         setuser(null);
+         setIsLoggedin(false);
+      }
+   }, [_id]);
 
 
    useEffect(() => {
@@ -46,14 +62,7 @@ function CommentCard({ comment: { content, createdAt, _id, owner, likes = [] } }
    }, [owner, dispatch]);
 
    // Initialize like status
-   useEffect(() => {
-      if (user && likes?.includes(user._id)) {
-         setIsLiked(true);
-      }
-      if (user) {
-         setIsLoggedin(true);
-      }
-   }, [dispatch]);
+
 
    const handleDelete = async () => {
       try {
@@ -98,61 +107,71 @@ function CommentCard({ comment: { content, createdAt, _id, owner, likes = [] } }
    };
 
    // Like button handler
+
+
    const handleLike = async () => {
       try {
+         if (!isLoggedin) {
+            toast.info("Please login to like");
+            return;
+         }
          if (!_id) return;
-         if (!user) return;
-         if (!isLoggedin) return;
+
          setLoading(true);
          const res = await dispatch(addAsyncCommentLike(_id));
-         if (addAsyncCommentLike.fulfilled.match(res)) {
-            const loggedInUser = res.payload;
 
-            if (loggedInUser && loggedInUser.length >= 0) {
-               // check if current user has liked the video
-               const liked = loggedInUser.some((like) => like.likeBy.includes(user._id));
-               setIsLiked(liked);
-            } else {
-               setIsLiked(false);
-            }
+         if (addAsyncCommentLike.fulfilled.match(res)) {
+            const likedUsers = res.payload; // array of users who liked this comment
+            setLikes(likedUsers);
+            setLikeCount(likedUsers.length);
+
+            // check if logged-in user is in the likes
+            const liked = likedUsers.some((like) => like.likeBy === user._id);
+            setIsLiked(liked);
          }
       } catch (error) {
-         console.log(error)
+         console.log(error);
       } finally {
          setLoading(false);
       }
-   }
+   };
 
    useEffect(() => {
       const fetchCommentLike = async () => {
          try {
-            if (!user) return;
             if (!_id) return;
             const res = await dispatch(fetchAsyncCommentLike(_id));
+
             if (fetchAsyncCommentLike.fulfilled.match(res)) {
-               const loggedInUser = res.payload;
-               if (loggedInUser.length > 0) {
-                  setLikeCount(loggedInUser.length);
-                  loggedInUser.map((like) => {
-                     const liked = like.likeBy.includes(user._id)
-                     if (liked) {
-                        setIsLiked(true);
-                     }
-                  })
+               const likedUsers = res.payload;
+               setLikes(likedUsers);
+               setLikeCount(likedUsers.length);
+
+               // check if logged-in user liked this comment
+               if (user?._id) {
+                  const liked = likedUsers.some((like) => like.likeBy === user._id);
+                  setIsLiked(liked);
                }
-
             }
-
          } catch (error) {
             console.log(error);
-
          } finally {
             setLoading(false);
          }
-      }
-      fetchCommentLike()
-   }, [dispatch])
+      };
 
+      fetchCommentLike();
+   }, [dispatch, _id]);
+
+
+   useEffect(() => {
+      if (!user?._id) {
+         return
+      }
+      if (user && liked?.includes(user._id)) {
+         setIsLiked(true);
+      }
+   }, [dispatch, _id]);
 
 
    return (
@@ -232,13 +251,13 @@ function CommentCard({ comment: { content, createdAt, _id, owner, likes = [] } }
                         <>
                            <button
                               onClick={handleEditToggle}
-                              className="flex items-center gap-1 text-blue-600 hover:text-blue-800"
+                              className="flex items-center gap-1 "
                            >
                               <FaEdit size={14} /> Edit
                            </button>
                            <button
                               onClick={handleDelete}
-                              className="flex items-center gap-1 text-red-600 hover:text-red-800"
+                              className="flex items-center gap-1 "
                            >
                               <FaTrashAlt size={14} /> Delete
                            </button>
@@ -248,6 +267,7 @@ function CommentCard({ comment: { content, createdAt, _id, owner, likes = [] } }
                )}
             </div>
          </div>
+         {showLogin && <LoginPopUp setSetShowLogin={setSetShowLogin} />}
       </div>
    );
 }

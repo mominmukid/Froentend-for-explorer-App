@@ -22,7 +22,8 @@ import {
 } from "../../store/CommentSlice";
 import CommentCard from "../comments/CommentCard";
 import { getVideoLikes } from "../../store/likeSlice";
-
+import Share from "../share/Share"
+import LoginPopUp from '../loginpupUp/LoginPopUp'
 
 function Videoplayer({
   singleVideo: { _id, title, videoFile, description, views, createdAt, owner },
@@ -31,16 +32,30 @@ function Videoplayer({
   const videos = useSelector(getAllVideos);
   const userLike = useSelector(getLike);
   const commentStatus = useSelector((state) => state.comment.commentStatus);
-
   const [likes, setlikes] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [subscribeCount, setSubscribeCount] = useState(0);
   const [ownerData, setOwnerData] = useState(null);
+  const [user, setuser] = useState({});
 
-  const user = localStorage.getItem("user")
-    ? JSON.parse(localStorage.getItem("user"))
-    : null;
+
+  useEffect(() => {
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      const parsed = JSON.parse(userData);
+      if (parsed?.user) {
+        setuser(parsed.user);
+        setIsLoggedin(true);
+      } else {
+        setuser(null);
+        setIsLoggedin(false);
+      }
+    } else {
+      setuser(null);
+      setIsLoggedin(false);
+    }
+  }, [_id, title]);
 
   const [loading, setLoading] = useState(true);
   const [showDesc, setShowDesc] = useState(false);
@@ -51,20 +66,6 @@ function Videoplayer({
     useSelector(getAllComments)
   );
   const [commentLoading, setCommentLoading] = useState(false);
-
-  // useEffect(() => {
-  //   setVideoUrl(videoFile)
-  //   console.log(videoUrl);
-
-  // }, [title,_id])
-  // Check login from cookie
-  useEffect(() => {
-    if (user) {
-      setIsLoggedin(true);
-    } else {
-      setIsLoggedin(false);
-    }
-  }, []);
 
   // Fetch subscribers & views
   useEffect(() => {
@@ -137,17 +138,13 @@ function Videoplayer({
 
   // Handle like
   const handleLike = async () => {
-    if (!isLoggedin) return;
+    if (!isLoggedin) {
+      toast.info("Please login to like");
+      return;
+    };
     try {
       if (!_id) return;
-      const resultAction = await dispatch(setuserLike(_id));
-      if (setuserLike.fulfilled.match(resultAction)) {
-        const likedUsers = resultAction.payload;
-        setlikes(likedUsers.length);
-        const liked = likedUsers.some((like) => like.likeBy.includes(user._id));
-        setIsLiked(liked);
-      }
-      toast.success("Like successfully", { autoClose: 2000 })
+      await dispatch(setuserLike(_id));
     } catch (error) {
       console.log(error);
 
@@ -156,7 +153,11 @@ function Videoplayer({
 
   // Handle subscription
   const handleSubscription = async (id) => {
-    if (!id || !user || !isLoggedin) return;
+     if (!isLoggedin) {
+      toast.info("Please login to subscribe");
+      return;
+    };
+    if (!id ) return;
     const resultAction = await dispatch(userSubscribeTochannel(id));
     if (userSubscribeTochannel.fulfilled.match(resultAction)) {
       const subscribedUsers = resultAction.payload;
@@ -167,7 +168,11 @@ function Videoplayer({
 
   // Handle comment
   const handleAddComment = async () => {
-    if (!isLoggedin || newComment.trim() === "" || !_id) return;
+     if (!isLoggedin) {
+      toast.info("Please login to comment");
+      return;
+    };
+    if ( newComment.trim() === "" || !_id) return;
     try {
       setLoading(true);
       await dispatch(addAsyncComment({ _id, newComment }));
@@ -182,7 +187,7 @@ function Videoplayer({
   // Fetch video likes
   useEffect(() => {
     const fetchVideoLike = async () => {
-      if (!user || !_id) return;
+      if ( !_id) return;
       try {
         const res = await dispatch(getVideoLikes(_id));
         if (getVideoLikes.fulfilled.match(res)) {
@@ -198,7 +203,7 @@ function Videoplayer({
       }
     };
     fetchVideoLike();
-  }, [dispatch, user, _id]);
+  }, [dispatch, user, _id, handleLike]);
 
   const date = new Date(createdAt);
 
@@ -311,7 +316,7 @@ function Videoplayer({
             />
             <button
               onClick={handleAddComment}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+              className="px-4 py-2 bg-gradient-to-r from-[#8b04a4] via-[#fd3243] to-[#e11755] text-white rounded-lg"
             >
               Post
             </button>
@@ -338,6 +343,8 @@ function Videoplayer({
           {loading ? <Loader /> : videos?.map((video) => <SuggestedVideo key={video._id} video={video} />)}
         </div>
       </div>
+      {showShare && (<Share setShowShare={setShowShare} links={`https://wideview.netlify.app/video/${_id}`} />)}
+      {/* {showLogin && <LoginPopUp setSetShowLogin={setSetShowLogin} />} */}
     </div>
   );
 }

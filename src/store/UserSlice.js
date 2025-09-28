@@ -31,9 +31,7 @@ export const loginAsyncUser = createAsyncThunk(
       );
       return response.data.data; // user info & token
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || error.message || "Failed to login"
-      );
+      return rejectWithValue(error.response?.data);
     }
   }
 );
@@ -60,9 +58,7 @@ export const ragisterAsyncUser = createAsyncThunk(
 
       return response.data.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || error.message || "Failed to register"
-      );
+      return rejectWithValue(error.response?.data);
     }
   }
 );
@@ -271,8 +267,8 @@ export const logoutUser = createAsyncThunk(
 export const updateUserPassword = createAsyncThunk(
   "update/user/Password",
   async ({ newPassword, oldPassword }, { rejectWithValue }) => {
-    console.log(newPassword,oldPassword);
-    
+    console.log(newPassword, oldPassword);
+
     try {
       await axios.post(
         `${baseUrl}/users/change-password`,

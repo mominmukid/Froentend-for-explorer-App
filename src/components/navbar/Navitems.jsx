@@ -20,7 +20,9 @@ function Navitems({ handelList, handleIsBlock }) {
    useEffect(() => {
       const userData = localStorage.getItem("user");
       if (userData) {
-         setLocalUser(JSON.parse(userData));
+         const data=JSON.parse(userData);
+         setLocalUser(data.user)
+         
       }
 
    }, [reduxUser, userStatus]); // 👈 rerun when reduxUser changes
@@ -53,7 +55,7 @@ function Navitems({ handelList, handleIsBlock }) {
 
             {/* Logo */}
             <NavLink to="/" className='text-3xl md:text-2xl font-bold text-red-600 w-10 h-10'>
-               <img src="public/Images/logo.png" alt="public/Images/logo.png" className='w-full h-full' />
+               <img src="/Images/logo.png" alt="W" className='w-full h-full' />
             </NavLink>
             <span className='font-bold text-xl text-black hidden md:block dark:text-white font-serif italic'>Wideview</span>
          </div>

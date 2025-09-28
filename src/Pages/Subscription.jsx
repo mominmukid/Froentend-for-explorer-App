@@ -8,10 +8,27 @@ import Loader from '../Pages/Loader'  // ✅ your loader component
 function Subscription() {
   const [subscribes, setSubscribes] = useState([]);
   const [loading, setLoading] = useState(true); // ✅ loader state
-  const user = localStorage.getItem("user")
-    ? JSON.parse(localStorage.getItem("user"))
-    : null;
+  const [user, setuser] = useState({});
+
   const dispatch = useDispatch()
+
+
+  useEffect(() => {
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      const parsed = JSON.parse(userData);
+      if (parsed?.user) {
+        setuser(parsed.user);
+
+      } else {
+        setuser(null);
+
+      }
+    } else {
+      setuser(null);
+
+    }
+  }, [dispatch]);
 
   useEffect(() => {
     const fetchUserSubscribrs = async (id) => {
@@ -26,7 +43,7 @@ function Subscription() {
       } catch (error) {
         console.error("Error fetching subscriptions:", error);
       } finally {
-        setLoading(false); 
+        setLoading(false);
       }
     }
     if (user?._id) {

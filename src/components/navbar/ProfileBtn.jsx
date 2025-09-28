@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import { useEffect, useRef, useState } from "react";
 import { logoutUser } from '../../store/UserSlice'
 import { toast } from "react-toastify";
+import { FcAbout } from "react-icons/fc";
 
 
 
@@ -98,6 +99,18 @@ function ProfileBtn({ isblock, setIsblock }) {
             <IoIosSettings />
           </span>
           <span className="text-[18px] font-semibold">Setting</span>
+        </NavLink>
+
+
+        <NavLink
+          to="/about"
+          className={`   w-full pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer`}
+          onClick={() => setIsblock(false)}
+        >
+          <span className="text-[23px] text-gray-900 font-extrabold">
+            <FcAbout />
+          </span>
+          <span className="text-[18px] font-semibold">About Us</span>
         </NavLink>
 
         <hr className="text-gray-400 mt-2" />
