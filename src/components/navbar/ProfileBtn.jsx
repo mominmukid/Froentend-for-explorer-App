@@ -1,22 +1,16 @@
+import { useEffect, useState, useRef } from "react";
 import { MdOutlineDashboard, MdLogout } from "react-icons/md";
 import { RiLoginBoxLine } from "react-icons/ri";
 import { IoIosSettings } from "react-icons/io";
 import { NavLink } from "react-router";
-import { clearUser } from '../../store/UserSlice';
+import { clearUser, logoutUser } from '../../store/UserSlice';
 import { useDispatch } from "react-redux";
-import { useEffect, useRef, useState } from "react";
-import { logoutUser } from '../../store/UserSlice'
 import { toast } from "react-toastify";
-import { FcAbout } from "react-icons/fc";
-
-
 
 function ProfileBtn({ isblock, setIsblock }) {
   const dispatch = useDispatch();
   const dropdownRef = useRef(null);
   const [localUser, setLocalUser] = useState(null);
-
-
 
   const logout = async () => {
     localStorage.removeItem("user");
@@ -24,29 +18,18 @@ function ProfileBtn({ isblock, setIsblock }) {
     setIsblock(false);
     const resultAction = await dispatch(logoutUser());
     if (logoutUser.fulfilled.match(resultAction)) {
-      toast.success("Logout successFully", {
-        position: "top-right",
-        autoClose: 1000,
-        theme: "dark",
-      });
+      toast.success("Logout successfully", { position: "top-right", autoClose: 1000, theme: "dark" });
       window.location.reload();
     } else {
-      toast.error(" Logout failed", {
-        position: "top-right",
-        autoClose: 2000,
-        theme: "dark",
-      });
-      throw new Error("logout Failed failed");
+      toast.error("Logout failed", { position: "top-right", autoClose: 2000, theme: "dark" });
+      throw new Error("Logout failed");
     }
   };
 
-
   useEffect(() => {
     const userData = localStorage.getItem("user");
-    if (userData) {
-      setLocalUser(JSON.parse(userData));
-    }
-  }, [dispatch,]);
+    if (userData) setLocalUser(JSON.parse(userData));
+  }, [dispatch]);
 
   // Hide dropdown when clicking outside
   useEffect(() => {
@@ -55,75 +38,64 @@ function ProfileBtn({ isblock, setIsblock }) {
         setIsblock(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-
-  }, [setIsblock, dispatch]);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [setIsblock]);
 
   return (
     <div ref={dropdownRef}>
       <li
-        className={`${isblock ? "block" : "hidden"} fixed top-15 right-4 sm:right-36 lg:right-42 rounded-[20px] overflow-hidden h-fit min-w-[40%] sm:min-w-[13%] bg-white flex flex-col justify-start border-gray-300 border-1 pb-1`}
+        className={`${isblock ? "block" : "hidden"} fixed top-16 right-4 sm:right-36 lg:right-42 rounded-2xl overflow-hidden min-w-[40%] sm:min-w-[13%] bg-white  flex flex-col border border-gray-300 dark:border-gray-700 shadow-lg`}
       >
+        {/* Dashboard */}
         <NavLink
           to="/dashboard"
-          className={`${localUser ? "block" : "hidden"} w-full pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer`}
+          className={`${localUser ? "flex" : "hidden"} items-center gap-3 px-4 py-2 hover:bg-gray-200  transition`}
           onClick={() => setIsblock(false)}
         >
-          <span className="text-[23px] font-extrabold">
-            <MdOutlineDashboard />
-          </span>
-          <span className="text-[18px] font-semibold">Dashboard</span>
+          <MdOutlineDashboard className="text-[23px]" />
+          <span className="text-[16px] font-semibold">Dashboard</span>
         </NavLink>
 
+        {/* Login */}
         <NavLink
           to="/login"
-          className={` ${!localUser ? "block" : "hidden"} w-full pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer`}
+          className={`${!localUser ? "flex" : "hidden"} items-center gap-3 px-4 py-2 hover:bg-gray-200 transition`}
           onClick={() => setIsblock(false)}
         >
-          <span className="text-[23px] font-extrabold">
-            <RiLoginBoxLine />
-          </span>
-          <span className="text-[18px] font-semibold">Login</span>
+          <RiLoginBoxLine className="text-[23px]" />
+          <span className="text-[16px] font-semibold">Login</span>
         </NavLink>
 
+        {/* Settings */}
         <NavLink
           to="/setting"
-          className={`${localUser ? "block" : "hidden"} w-full pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer`}
+          className={`${localUser ? "flex" : "hidden"} items-center gap-3 px-4 py-2 hover:bg-gray-200  transition`}
           onClick={() => setIsblock(false)}
         >
-          <span className="text-[23px] font-extrabold">
-            <IoIosSettings />
-          </span>
-          <span className="text-[18px] font-semibold">Setting</span>
+          <IoIosSettings className="text-[23px]" />
+          <span className="text-[16px] font-semibold">Settings</span>
         </NavLink>
 
-
+        {/* About */}
         <NavLink
           to="/about"
-          className={`   w-full pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer`}
+          className="flex items-center gap-3 px-4 py-2 hover:bg-gray-200  transition"
           onClick={() => setIsblock(false)}
         >
-          <span className="text-[23px] text-gray-900 font-extrabold">
-            <FcAbout />
-          </span>
-          <span className="text-[18px] font-semibold">About Us</span>
+          <span className="text-[23px] font-bold text-gray-900  pl-2">i</span>
+          <span className="text-[16px] font-semibold">About Us</span>
         </NavLink>
 
-        <hr className="text-gray-400 mt-2" />
+        <hr className="border-gray-300 dark:border-gray-700 my-2" />
+
+        {/* Logout */}
         <ul
-          className={`${localUser ? "block" : "hidden"} w-full pl-4 py-2 gap-3 flex justify-start items-center hover:bg-gray-200 cursor-pointer`}
+          className={`${localUser ? "flex" : "hidden"} items-center gap-3 px-4 py-2 hover:bg-red-100 cursor-pointer transition`}
           onClick={logout}
         >
-          <span className="text-[25px] text-red-600 font-extrabold">
-            <MdLogout />
-          </span>
-          <span className="text-[18px] font-semibold text-red-600">
-            Logout
-          </span>
+          <MdLogout className="text-[23px] text-red-600" />
+          <span className="text-[16px] font-semibold text-red-600">Logout</span>
         </ul>
       </li>
     </div>

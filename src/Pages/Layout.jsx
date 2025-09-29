@@ -130,7 +130,7 @@ function Layout() {
                <Route path="/login" element={<Login />} />
                <Route path="/register" element={<Register />} />
                <Route path="/playlist/create" element={<PlaylistCreate />} />
-               <Route path="/playlist/show" element={<PlaylistDetailsPage />} />
+               <Route path="/playlist/show/:id" element={<PlaylistDetailsPage />} />
                <Route path="/loder" element={<Loder />} />
                <Route path="/about" element={<AboutUs />} />
             </Routes>
