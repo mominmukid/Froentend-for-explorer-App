@@ -64,7 +64,7 @@ function ProfileBtn({ isblock, setIsblock }) {
           onClick={() => setIsblock(false)}
         >
           <RiLoginBoxLine className="text-[23px]" />
-          <span className="text-[16px] font-semibold">Login</span>
+          <span className="text-[16px] font-semibold">Login/Register</span>
         </NavLink>
 
         {/* Settings */}

@@ -90,7 +90,7 @@ function Login() {
                   className="inline-flex justify-start items-center ml-[-2.5rem] gap-2 mb-4"
                >
                   <span className="text-red-500 text-2xl ">
-                     <img src="public/Images/logo.png" alt="public/Images/logo.png" className='w-8 h-8 mt-[-12px]' />
+                     <img src="public/Images/logo.svg" alt="image" className='w-8 h-8 mt-[-12px]' />
                   </span>
                   <span className="text-2xl font-bold font-serif italic">Wideview</span>
                </NavLink>

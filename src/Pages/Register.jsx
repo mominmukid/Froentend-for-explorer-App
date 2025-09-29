@@ -165,7 +165,7 @@ const Signup = () => {
         <div className="text-center mb-8">
           <NavLink to="/" className="inline-flex items-center gap-2 mb-4">
             <span className="rounded-full flex items-center justify-center text-red-500 text-2xl  ml-[-3rem] font-bold">
-              <img src="public/Images/logo.png" alt="public/Images/logo.png" className='w-8 h-8 mt-[-12px]' />
+              <img src="public/Images/logo.svg" alt="logo" className='w-8 h-8 mt-[-12px]' />
             </span>
             <span className="text-2xl font-bold font-serif italic">Wideview</span>
           </NavLink>
