@@ -6,32 +6,34 @@ import timeAgo from "../../utils/uploadedTime";
 import { useNavigate } from "react-router";
 import { FiMoreVertical } from "react-icons/fi";
 import { removeVideoFromPlaylist } from "../../store/playlistSlice";
+import { toast } from "react-toastify";
 
 function PlayListCard({ videoId, onRemove, playlistId }) {
    const [loading, setLoading] = useState(false);
    const [video, setVideo] = useState(null);
    const [ownerDetails, setOwnerDetails] = useState(null);
-   const [menuOpen, setMenuOpen] = useState(false); // for three-dot menu
+   const [menuOpen, setMenuOpen] = useState(false); // for three-dot 
    const menuRef = useRef();
    const dispatch = useDispatch();
    const navigate = useNavigate();
 
    // Fetch video details
-   useEffect(() => {
-      const fetchVideo = async (id) => {
-         try {
-            if (!id) return;
-            setLoading(true);
-            const result = await dispatch(fetchAsyncVideoSingle(id));
-            if (fetchAsyncVideoSingle.fulfilled.match(result)) {
-               setVideo(result.payload);
-            }
-         } catch (error) {
-            console.error("Error fetching video:", error);
-         } finally {
-            setLoading(false);
+
+   const fetchVideo = async (id) => {
+      try {
+         if (!id) return;
+         setLoading(true);
+         const result = await dispatch(fetchAsyncVideoSingle(id));
+         if (fetchAsyncVideoSingle.fulfilled.match(result)) {
+            setVideo(result.payload);
          }
-      };
+      } catch (error) {
+         console.error("Error fetching video:", error);
+      } finally {
+         setLoading(false);
+      }
+   };
+   useEffect(() => {
       fetchVideo(videoId);
    }, [dispatch, videoId]);
 
@@ -68,12 +70,18 @@ function PlayListCard({ videoId, onRemove, playlistId }) {
    const hanndelRemove = async (playlistId, videoId) => {
       try {
          if (!playlistId || !videoId) return;
-         await dispatch(removeVideoFromPlaylist({ playlistId, videoId }))
+         const result = await dispatch(removeVideoFromPlaylist({ playlistId, videoId }))
+         if (removeVideoFromPlaylist.fulfilled.match(result)) {
+            toast.success("Video remove successfully")
+            window.location.reload();
+         }
+
       } catch (error) {
          console.log(error);
 
       } finally {
          setLoading(false)
+
       }
    }
 
