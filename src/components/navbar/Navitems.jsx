@@ -5,21 +5,23 @@ import { PiListBold } from "react-icons/pi";
 import { MdOutlineVideoCall, MdMic } from "react-icons/md";
 import { GoSun } from "react-icons/go";
 import { IoMoon } from "react-icons/io5";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { getUser } from "../../store/UserSlice";
 import { CiSearch } from "react-icons/ci";
 import AltImage from "../../../public/Images/profile.png";
+import { searchAllVideos, selectSearchVideos } from "../../store/searchSlice"; 
 
 function Navitems({ handelList, handleIsBlock }) {
    const reduxUser = useSelector(getUser);
    const userStatus = useSelector((state) => state.user.userStatus);
    const [localUser, setLocalUser] = useState(null);
-
    const [isDark, setisDark] = useState(false);
    const [mobileSearch, setMobileSearch] = useState(false);
    const [searchTerm, setSearchTerm] = useState("");
 
    const recognitionRef = useRef(null);
+   const dispatch = useDispatch();
+   const AllVideos = useSelector(selectSearchVideos);
 
    useEffect(() => {
       const userData = localStorage.getItem("user");
@@ -28,7 +30,7 @@ function Navitems({ handelList, handleIsBlock }) {
          setLocalUser(data.user);
       }
 
-      // Initialize Speech Recognition
+      // ✅ Speech Recognition setup
       if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
          const SpeechRecognition =
             window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -39,11 +41,13 @@ function Navitems({ handelList, handleIsBlock }) {
          recognitionRef.current.onresult = (event) => {
             const transcript = event.results[0][0].transcript;
             setSearchTerm(transcript);
+            dispatch(searchAllVideos({ searchTerm: transcript }));
+            setMobileSearch(false); // auto close on voice search
          };
 
          recognitionRef.current.onerror = (err) => console.error(err);
       }
-   }, [reduxUser, userStatus]);
+   }, [reduxUser, userStatus, dispatch]);
 
    const user = reduxUser?.user || localUser;
 
@@ -65,6 +69,19 @@ function Navitems({ handelList, handleIsBlock }) {
       }
    };
 
+   const handleSearch = async () => {
+      if (!searchTerm.trim()) return;
+      await dispatch(searchAllVideos({ searchTerm }));
+      console.log(AllVideos);
+   };
+
+   const handleMobileEnter = async (e) => {
+      if (e.key === "Enter") {
+         await handleSearch();
+         setMobileSearch(false); // close mobile overlay after search
+      }
+   };
+
    return (
       <>
          {/* Mobile Search Overlay */}
@@ -83,6 +100,7 @@ function Navitems({ handelList, handleIsBlock }) {
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyDown={handleMobileEnter} // ✅ Enter triggers search
                   placeholder="Search videos..."
                   className="flex-1 h-10 px-4 rounded-full border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 outline-none"
                />
@@ -94,6 +112,7 @@ function Navitems({ handelList, handleIsBlock }) {
                >
                   <MdMic />
                </button>
+               {/* ❌ Removed search button for mobile */}
             </div>
          ) : (
             <div className="flex items-center justify-between w-full px-4 h-[60px]">
@@ -120,10 +139,16 @@ function Navitems({ handelList, handleIsBlock }) {
                <div className="hidden md:flex w-[60%] px-4 rounded-full outline-none border border-gray-600 overflow-hidden h-[70%] items-center relative">
                   <input
                      type="text"
+                     value={searchTerm}
+                     onChange={(e) => setSearchTerm(e.target.value)}
                      placeholder="Search videos..."
                      className="w-full px-4 py-1 outline-none dark:text-white"
+                     onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                   />
-                  <CiSearch className="text-xl text-gray-600 dark:text-white absolute right-4 cursor-pointer" />
+                  <CiSearch
+                     className="text-xl text-gray-600 dark:text-white absolute right-4 cursor-pointer"
+                     onClick={handleSearch} // ✅ desktop button
+                  />
                </div>
 
                {/* Right: Icons */}

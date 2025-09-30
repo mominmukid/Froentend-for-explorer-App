@@ -38,7 +38,6 @@ export const createPlayList = createAsyncThunk(
   "playlist/create",
   async ({ name, description, thumbnail }, { rejectWithValue }) => {
     try {
-      
       const formData = new FormData();
       formData.append("name", name);
       formData.append("description", description);
@@ -46,7 +45,7 @@ export const createPlayList = createAsyncThunk(
         formData.append("Thumbnel", thumbnail); // file object
       }
       console.log(formData);
-      
+
       const response = await fetch(`${baseUrl}/playlist/crete-playlist`, {
         method: "POST",
         credentials: "include",
@@ -141,8 +140,31 @@ export const deletePlaylist = createAsyncThunk(
   }
 );
 
+export const addVideoPlaylist = createAsyncThunk(
+  "addvideo/plylist",
+  async ({ selectedPlaylist, videoId }, { rejectWithValue }) => {
+    try {
+      const response = await fetch(
+        `${baseUrl}/playlist/addvideo-playlist/${selectedPlaylist}/${videoId}`,
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to update comment");
+      }
+      return;
+    } catch (error) {
+      console.error("Update comment error:", error);
+      return rejectWithValue(error.message || "Something went wrong");
+    }
+  }
+);
+
 const playlistSlice = createSlice({
-  name: "comment",
+  name: "playlish",
   initialState,
   reducers: {},
   extraReducers: (builder) => {

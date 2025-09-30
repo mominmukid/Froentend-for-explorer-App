@@ -2,10 +2,8 @@ import React, { useState } from "react";
 import { FaCopy, FaFacebook, FaTwitter, FaWhatsapp } from "react-icons/fa";
 import { toast } from "react-toastify";
 
-function ShareBox({ setShowShare,links }) {
+function ShareBox({ setShowShare, links }) {
   const [link] = useState(links);
- 
-  
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(link);
@@ -16,7 +14,6 @@ function ShareBox({ setShowShare,links }) {
     setShowShare(false);
   };
 
-  // Open site with the link
   const handleShare = (platform) => {
     let shareUrl = "";
     switch (platform) {
@@ -42,7 +39,7 @@ function ShareBox({ setShowShare,links }) {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center  bg-opacity-50 z-50">
+    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-[999]">
       <div className="w-full max-w-sm p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-lg border dark:border-gray-700">
         <h2 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white text-center">
           Share this link

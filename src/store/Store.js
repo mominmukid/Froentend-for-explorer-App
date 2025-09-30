@@ -6,6 +6,7 @@ import userReducer from "./UserSlice";
 import subscriptionReducer from "./subscriptionSlice";
 import likeReducer from "./likeSlice";
 import playlistReducer from "./playlistSlice";
+import searchReducer from "./searchSlice";
 
 const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ const store = configureStore({
     subscription: subscriptionReducer,
     like: likeReducer,
     palylist: playlistReducer,
+    search: searchReducer,
   },
 });
 
