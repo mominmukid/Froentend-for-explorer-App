@@ -103,7 +103,7 @@ function Dashboard() {
             {/* User Info */}
             <div className="pt-12 md:mt-0 md:ml-6 text-center md:text-left">
               <h2 className="text-2xl font-bold  text-gray-800 dark:text-gray-300">
-                {user?.fullname || "Full Name"}
+                {user?.fullname || "Update Full Name"}
               </h2>
               <p className="text-gray-800 dark:text-gray-300">
                 @{user?.username || "username"}

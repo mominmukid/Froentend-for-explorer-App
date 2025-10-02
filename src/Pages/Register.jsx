@@ -7,7 +7,9 @@ import { toast } from "react-toastify";
 import { IoMdEyeOff } from "react-icons/io";
 import { IoEye } from "react-icons/io5";
 import { useDispatch } from "react-redux";
-import { ragisterAsyncUser } from "../store/UserSlice";
+import { loginUserWithGoogle, ragisterAsyncUser } from "../store/UserSlice";
+import { useGoogleLogin } from "@react-oauth/google";
+import { FcGoogle } from "react-icons/fc";
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -157,6 +159,41 @@ const Signup = () => {
       trigger("coverImage");
     }
   };
+
+
+
+  const responceGoogle = async (authResult) => {
+    try {
+      if (authResult['code']) {
+        const resultAction = await dispatch(loginUserWithGoogle(authResult['code']))
+        if (loginUserWithGoogle.fulfilled.match(resultAction)) {
+          const loggedInUser = resultAction.payload; // ✅ user + tokens from backend
+
+          // ✅ Save user object in localStorage
+
+          await saveUser(loggedInUser.user)
+          toast.success("Login successful", {
+            position: "top-right",
+            autoClose: 1000,
+            theme: "dark",
+          });
+          navigate("/");
+          window.location.reload();
+        }
+      }
+
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: responceGoogle,
+    onError: responceGoogle,
+    'flow': "auth-code"
+
+  })
 
   return (
     <div className="min-h-screen flex items-center justify-center">
@@ -369,6 +406,29 @@ const Signup = () => {
             )}
           </button>
         </form>
+
+        <div className="relative my-6 ">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-600"></div>
+          </div>
+          <div className="  relative flex justify-center text-sm">
+            <span className="px-2 bg-gray-950 text-gray-200">
+              Or continue with
+            </span>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 place-items-center ">
+          <button
+            type="button"
+            className="w-[80%] flex items-center justify-center px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors gap-3 "
+            onClick={googleLogin}
+          >
+            <span className="text-2xl">
+              <FcGoogle />
+            </span>
+            <span className="text-xl text-white font-semibold">Google</span>
+          </button>
+        </div>
 
         {/* Signin link */}
         <div className="text-center mt-6">

@@ -36,6 +36,25 @@ export const loginAsyncUser = createAsyncThunk(
   }
 );
 
+export const loginUserWithGoogle = createAsyncThunk(
+  "auth/login",
+  async (code, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `${baseUrl}/users/googlelogin?code=${code}`,
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      console.log(response.data.data);
+      return response.data.data; // user info & token
+    } catch (error) {
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
+
 export const ragisterAsyncUser = createAsyncThunk(
   "auth/ragister",
   async (

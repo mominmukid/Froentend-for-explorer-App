@@ -26,9 +26,26 @@ import AboutUs from "./AboutUs";
 import Navbar from "../components/navbar/Navbar";
 import SideBox from "../components/navbar/Sidebox";
 import CheckAuthentication from "../components/checkAuthntication";
-
+import { GoogleOAuthProvider } from "@react-oauth/google";
 function Layout() {
    const toggle = useSelector((state) => state.video.isvisibal);
+
+   const GoogleAuthWrapper = () => {
+      return (
+         <GoogleOAuthProvider clientId="236592362331-vinaksruka2657hb8ofh5cho59cohugd.apps.googleusercontent.com">
+            <Login />
+            
+         </GoogleOAuthProvider>
+      )
+   }
+   const GoogleAuthWrapper2 = () => {
+      return (
+         <GoogleOAuthProvider clientId="236592362331-vinaksruka2657hb8ofh5cho59cohugd.apps.googleusercontent.com">
+         
+            <Register/>
+         </GoogleOAuthProvider>
+      )
+   }
 
    return (
       <div>
@@ -127,8 +144,8 @@ function Layout() {
 
                {/* Public Routes */}
                <Route path="/video/:id" element={<VideoPage />} />
-               <Route path="/login" element={<Login />} />
-               <Route path="/register" element={<Register />} />
+               <Route path="/login" element={<GoogleAuthWrapper />} />
+               <Route path="/register" element={<GoogleAuthWrapper2 />} />
                <Route path="/playlist/create" element={<PlaylistCreate />} />
                <Route path="/playlist/show/:id" element={<PlaylistDetailsPage />} />
                <Route path="/loder" element={<Loder />} />
