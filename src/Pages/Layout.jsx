@@ -32,7 +32,7 @@ function Layout() {
 
    const GoogleAuthWrapper = () => {
       return (
-         <GoogleOAuthProvider clientId="236592362331-vinaksruka2657hb8ofh5cho59cohugd.apps.googleusercontent.com">
+         <GoogleOAuthProvider clientId="717402326393-gvv9ls6lfjr8ci9cjfnkg3oh4fe9m6lv.apps.googleusercontent.com">
             <Login />
             
          </GoogleOAuthProvider>
@@ -40,7 +40,7 @@ function Layout() {
    }
    const GoogleAuthWrapper2 = () => {
       return (
-         <GoogleOAuthProvider clientId="236592362331-vinaksruka2657hb8ofh5cho59cohugd.apps.googleusercontent.com">
+         <GoogleOAuthProvider clientId="717402326393-gvv9ls6lfjr8ci9cjfnkg3oh4fe9m6lv.apps.googleusercontent.com">
          
             <Register/>
          </GoogleOAuthProvider>
