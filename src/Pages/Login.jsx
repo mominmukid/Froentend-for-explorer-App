@@ -18,14 +18,14 @@ function Login() {
       mode: "onBlur", // 👈 validate when field loses focus (can use "onChange" for real-time)
    });
 
-   function saveUser(user) {
-      const now = new Date();
-      const item = {
-         user: user,
-         expiry: now.getTime() + 24 * 60 * 60 * 1000 // 1 day = 86400000 ms
-      };
-      localStorage.setItem("user", JSON.stringify(item));
-   }
+      function saveUser(user) {
+         const now = new Date();
+         const item = {
+            user: user,
+            expiry: now.getTime() + 24 * 60 * 60 * 1000 // 1 day = 86400000 ms
+         };
+         localStorage.setItem("user", JSON.stringify(item));
+      }
 
    const navigate = useNavigate();
    const [passwordVisible, setPasswordVisible] = useState(false);

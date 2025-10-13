@@ -28,8 +28,6 @@ export const searchAllVideos = createAsyncThunk(
       }
 
       const data = await response.json();
-      console.log(data.data);
-
       return data.data; // ✅ assuming your ApiResponce sends { status, data, message }
     } catch (error) {
       return rejectWithValue(error.message || "Something went wrong");

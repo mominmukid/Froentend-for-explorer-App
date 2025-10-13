@@ -8,6 +8,7 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 
 
 function VideoCard({ video: { _id, title, thumbnail, duration, views, createdAt, owner }, setShowShare, setId, setShowDownload, setShowPlaylist }) {
+    
     const dispatch = useDispatch();
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);

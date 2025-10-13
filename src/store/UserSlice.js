@@ -47,7 +47,7 @@ export const loginUserWithGoogle = createAsyncThunk(
           headers: { "Content-Type": "application/json" },
         }
       );
-      console.log(response.data.data);
+      
       return response.data.data; // user info & token
     } catch (error) {
       return rejectWithValue(error.response?.data);
@@ -286,7 +286,7 @@ export const logoutUser = createAsyncThunk(
 export const updateUserPassword = createAsyncThunk(
   "update/user/Password",
   async ({ newPassword, oldPassword }, { rejectWithValue }) => {
-    console.log(newPassword, oldPassword);
+    
 
     try {
       await axios.post(
