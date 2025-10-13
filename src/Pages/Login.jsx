@@ -9,6 +9,7 @@ import { IoMdEyeOff } from "react-icons/io";
 import { IoEye } from "react-icons/io5";
 import { useDispatch, } from "react-redux";
 import { loginAsyncUser, loginUserWithGoogle, } from "../store/UserSlice";
+import image from '../../public/Images/logo.png'
 function Login() {
    const {
       register,
@@ -126,7 +127,7 @@ function Login() {
                   className="inline-flex justify-start items-center ml-[-2.5rem] gap-2 mb-4"
                >
                   <span className="text-red-500 text-2xl ">
-                     <img src="public/Images/logo.svg" alt="image" className='w-8 h-8 mt-[-12px]' />
+                     <img src={image} alt="image" className='w-8 h-8 mt-[-12px]' />
                   </span>
                   <span className="text-2xl font-bold font-serif italic">Wideview</span>
                </NavLink>

@@ -10,6 +10,7 @@ import { useDispatch } from "react-redux";
 import { loginUserWithGoogle, ragisterAsyncUser } from "../store/UserSlice";
 import { useGoogleLogin } from "@react-oauth/google";
 import { FcGoogle } from "react-icons/fc";
+import image from '../../public/Images/logo.png'
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -202,7 +203,7 @@ const Signup = () => {
         <div className="text-center mb-8">
           <NavLink to="/" className="inline-flex items-center gap-2 mb-4">
             <span className="rounded-full flex items-center justify-center text-red-500 text-2xl  ml-[-3rem] font-bold">
-              <img src="public/Images/logo.svg" alt="logo" className='w-8 h-8 mt-[-12px]' />
+              <img src={image} alt="logo" className='w-8 h-8 mt-[-12px]' />
             </span>
             <span className="text-2xl font-bold font-serif italic">Wideview</span>
           </NavLink>
