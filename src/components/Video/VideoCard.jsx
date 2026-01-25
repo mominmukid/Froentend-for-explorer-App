@@ -7,7 +7,7 @@ import { setuserHistory, getUserdetils } from '../../store/UserSlice';
 import { BsThreeDotsVertical } from "react-icons/bs";
 
 
-function VideoCard({ video: { _id, title, thumbnail, duration, views, createdAt, owner }, setShowShare, setId, setShowDownload, setShowPlaylist }) {
+function VideoCard({ video: { _id, title, thumbnail, duration,viewsCount, createdAt, owner }, setShowShare, setId, setShowDownload, setShowPlaylist }) {
     
     const dispatch = useDispatch();
     const [user, setUser] = useState(null);
@@ -88,7 +88,7 @@ function VideoCard({ video: { _id, title, thumbnail, duration, views, createdAt,
                         {loading ? "Loading..." : user?.username || "Unknown User"}
                     </p>
                     <p className="text-gray-600 dark:text-gray-400 text-sm">
-                        {views} views • {uploadBefore}
+                        {viewsCount} views • {uploadBefore}
                     </p>
                 </div>
 

@@ -14,7 +14,7 @@ function LikeVideo() {
     // Fetch user history when component mounts
     // Assuming you have a Redux action to fetch user history
     dispatch(getUserLikedVideos());
-  }, [userLiked, dispatch]);
+  }, []);
   return (
     <>
       {/* <!-- Main Content --> */}

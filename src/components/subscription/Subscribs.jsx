@@ -42,7 +42,7 @@ function Subscribs({ video: { channel } }) {
       />
       <h3 className="font-semibold mb-2 text-gray-700 dark:text-gray-300">{user?.username}</h3>
       <p className="text-gray-700 dark:text-gray-300 text-sm mb-4">{subscribeCount} subscribers</p>
-      <button className="bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded-full text-sm font-medium w-full">
+      <button className="bg-white  border-[1.5px] border-red-700 hover:bg-red-700 hover:text-white hover:cursor-pointer px-4 py-2 rounded-full text-sm text-red-700 font-medium w-full">
         Subscribed
       </button>
     </NavLink>

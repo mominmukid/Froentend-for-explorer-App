@@ -91,7 +91,7 @@ export const uploadVideo = createAsyncThunk(
       });
 
       if (!response.ok) {
-        throw new Error("Failed to login");
+        throw new Error("Failed to upload video ");
       }
 
       return;
@@ -206,6 +206,7 @@ export const setVideoViews = createAsyncThunk(
         },
         credentials: "include", // send cookies
       });
+      console.log(await response.json());
 
       if (!response.ok) {
         const errorData = await response.json();

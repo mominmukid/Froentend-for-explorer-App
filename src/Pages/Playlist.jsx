@@ -44,7 +44,7 @@ function Playlist() {
           </p>
         </div>
         <button
-          className="bg-gradient-to-r from-[#8b04a4] via-[#fd3243] to-[#e11755] hover:scale-102  px-4 py-2 rounded-lg font-medium flex justify-center items-center gap-1 cursor-pointer mt-2"
+          className="bg-gradient-to-r from-[#8b04a4] via-[#fd3243] to-[#e11755] hover:scale-102  px-4 py-2 rounded-lg font-medium flex justify-center items-center gap-1 cursor-pointer mt-2 text-white"
           onClick={() => navigate("/playlist/create")}
         >
           <FaPlus />

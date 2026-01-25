@@ -10,13 +10,11 @@ function DashboardVideo({ video, setTotalViews, handleDeleteVideo }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const toast = useRef(null);
-  const { createdAt, views, likeCount, title, duration, _id, thumbnail } = video;
+  const { createdAt, viewsCount, likeCount, title, duration, _id, thumbnail } = video;
 
   const formattedDate = timeAgo(createdAt);
 
-  useEffect(() => {
-    setTotalViews((prevTotal) => prevTotal + Number(views?.[0] || 0));
-  }, [views, setTotalViews]);
+ 
 
   // Confirm delete function
   const confirmDelete = () => {
@@ -102,7 +100,7 @@ function DashboardVideo({ video, setTotalViews, handleDeleteVideo }) {
         <h3 className="font-medium mb-1 hover:underline">{title}</h3>
 
         <p className="text-gray-700 dark:text-gray-200 text-sm mb-2">
-          {views} views • {formattedDate}
+          {viewsCount} views • {formattedDate}
         </p>
 
         <div className="flex items-center gap-4 text-sm mb-3">

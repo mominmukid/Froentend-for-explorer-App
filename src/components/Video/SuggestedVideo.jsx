@@ -2,7 +2,7 @@ import React from "react";
 import { NavLink } from "react-router";
 import timeAgo from "../../utils/uploadedTime"; // your uploadedTime/timeAgo util
 
-function SuggestedVideo({ video: { _id, title, thumbnail, views, createdAt } }) {
+function SuggestedVideo({ video: { _id, title, thumbnail, viewsCount, createdAt } }) {
   const uploadedBefore = timeAgo(createdAt);
 
   return (
@@ -25,7 +25,7 @@ function SuggestedVideo({ video: { _id, title, thumbnail, views, createdAt } }) 
         <div className="flex flex-col justify-between flex-1">
           <h3 className="text-sm font-semibold line-clamp-2">{title}</h3>
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            {views} views • {uploadedBefore}
+            {viewsCount} views • {uploadedBefore}
           </p>
         </div>
       </div>

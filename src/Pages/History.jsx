@@ -105,7 +105,7 @@ function History() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div className="flex items-center gap-4">
             <button
-              className="bg-red-400 hover:bg-red-500 px-4 py-2 rounded-lg text-sm font-medium flex justify-center text-white items-center cursor-pointer opacity-100"
+              className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-sm font-medium flex justify-center text-white items-center cursor-pointer opacity-100"
               onClick={confirmClearHistory}
             >
               <MdDeleteForever className="mr-1" />
