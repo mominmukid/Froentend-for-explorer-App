@@ -26,7 +26,7 @@ import Share from "../share/Share"
 import LoginPopUp from '../loginpupUp/LoginPopUp'
 
 function Videoplayer({
-  singleVideo: { _id, title, videoFile, description, views, createdAt, owner },
+  singleVideo: { _id, title, videoFile, description, views,viewsCount, createdAt, owner },
 }) {
   const dispatch = useDispatch();
   const videos = useSelector(getAllVideos);
@@ -134,7 +134,7 @@ function Videoplayer({
       }
     };
     getAllCommentsData(_id);
-  }, [_id, dispatch, commentStatus]);
+  }, [_id, commentStatus]);
 
   // Handle like
   const handleLike = async () => {
@@ -203,9 +203,13 @@ function Videoplayer({
       }
     };
     fetchVideoLike();
-  }, [dispatch, user, _id, handleLike]);
+  }, [ handleLike]);
 
   const date = new Date(createdAt);
+
+  const hancdleWriteComment = (e) => {
+    setNewComment(e);
+  }
 
   return (
     <div className="text-gray-900 dark:text-white min-h-screen flex flex-col lg:flex-row gap-6 ">
@@ -225,7 +229,7 @@ function Videoplayer({
           <div className="flex-1">
             <h1 className="text-sm sm:text-xl font-bold mt-3">{title}</h1>
             <div className="text-sm text-gray-700 dark:text-gray-300 flex gap-2">
-              <p>{views} views</p>
+              <p>{viewsCount} views</p>
               <p>
                 {date.toLocaleString("en-US", {
                   month: "long",
@@ -310,7 +314,7 @@ function Videoplayer({
             <input
               type="text"
               value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
+              onChange={(e) => hancdleWriteComment(e.target.value)}
               placeholder="Add a comment..."
               className="flex-1 px-3 py-2 rounded-lg border dark:border-gray-700 min-w-40 dark:bg-gray-900 outline-none"
             />

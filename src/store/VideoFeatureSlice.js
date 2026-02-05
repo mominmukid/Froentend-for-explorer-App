@@ -76,6 +76,7 @@ export const uploadVideo = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
+      console.log(videoFile[0]);
       const formData = new FormData();
       formData.append("title", title);
       formData.append("description", description);
@@ -240,7 +241,7 @@ export const deleteVideo = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.message);
     }
-  }
+  } 
 );
 
 export const getAllVideos = (state) => state.videoframe.videos;
