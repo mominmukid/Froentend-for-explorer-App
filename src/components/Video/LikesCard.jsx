@@ -11,6 +11,7 @@ function LikeCard({
     owner: { username, avatar },
     thumbnail,
     views,
+    viewsCount,
     createdAt,
   },
 }) {
@@ -51,7 +52,7 @@ function LikeCard({
             />
             <span className="text-gray-800 dark:text-gray-300">{username}</span>
             <span>•</span>
-            <span>{views} views</span>
+            <span>{viewsCount} views</span>
             <span>•</span>
             <span>{uploadBefore}</span>
           </div>

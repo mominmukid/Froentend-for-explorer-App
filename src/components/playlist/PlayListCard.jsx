@@ -136,7 +136,7 @@ function PlayListCard({ videoId, onRemove, playlistId }) {
 
             {/* Views + Uploaded Time */}
             <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-               {video.views || 0} views • {timeAgo(video.createdAt)}
+               {video.viewsCount || 0} views • {timeAgo(video.createdAt)}
             </span>
          </div>
 

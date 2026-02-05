@@ -11,6 +11,7 @@ function HistoryVideo({
     owner: { username, avatar },
     thumbnail,
     views,
+    viewsCount,
     createdAt,
   },
 }) {
@@ -44,7 +45,7 @@ function HistoryVideo({
             />
             <span>{username}</span>
             <span>•</span>
-            <span>{views} views</span>
+            <span>{viewsCount} views</span>
             <span>•</span>
             <span>{uploadBefore}</span>
           </div>
