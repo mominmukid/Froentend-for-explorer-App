@@ -62,7 +62,7 @@ function Layout() {
 
          {/* Main Content */}
          <div
-            className={`ml-0 mt-13 p-4 dark:bg-[#202222] dark:text-white bg-[#f8f9fc] hide-scrollbar ${toggle ? "md:ml-[240px]" : "md:ml-0"
+            className={`ml-0 mt-13 p-4 h-full dark:bg-[#202222] dark:text-white bg-[#f8f9fc] hide-scrollbar ${toggle ? "md:ml-[240px]" : "md:ml-0"
                }`}
          >
             <Routes>

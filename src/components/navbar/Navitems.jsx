@@ -204,7 +204,7 @@ function Navitems({ handelList, handleIsBlock }) {
 
             {/* Dark/Light toggle */}
             <span
-              className={`text-10 w-fit h-fit rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 flex justify-center items-center cursor-pointer ${
+              className={`text-13 w-6 h-6 rounded-full hover:bg-gray-300 dark:hover:bg-gray-700 flex justify-center items-center cursor-pointer ${
                 !isDark ? "text-gray-800" : "text-gray-100"
               }`}
               onClick={hanelDark}
