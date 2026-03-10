@@ -14,6 +14,12 @@ function DashboardVideo({ video, setTotalViews, handleDeleteVideo }) {
 
   const formattedDate = timeAgo(createdAt);
 
+   useEffect(()=>{
+    // setTotalViews((prev) => prev + viewsCount);
+    console.log(typeof(viewsCount));
+    let viewsc=Number(viewsCount);
+    setTotalViews((prev) => prev + viewsc);
+   },[])
  
 
   // Confirm delete function

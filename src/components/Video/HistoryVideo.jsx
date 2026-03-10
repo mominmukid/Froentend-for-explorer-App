@@ -19,7 +19,7 @@ function HistoryVideo({
 
   return (
     <NavLink to={`/video/${_id}`} state={{ _id }}>
-      <div className="flex-1 sm:flex gap-4 p-3 rounded-lg bg-gray-200 dark:bg-gray-800 transition-colors mb-5">
+      <div className="flex-1 min-h-50 sm:flex gap-4 p-3 rounded-lg bg-gray-200 dark:bg-gray-800 hover:bg-gray-3 00 dark:hover:bg-gray-700 transition-colors mb-5">
         {/* Thumbnail (16:9 responsive box) */}
         <div className="relative flex-shrink-0 w-full sm:w-48 aspect-video">
           <img

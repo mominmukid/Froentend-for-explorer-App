@@ -67,7 +67,7 @@ function Layout() {
          >
             <Routes>
                <Route path="/" element={<Home />} />
-                <Route path="/subscription" element={ <Subscription /> }/>
+                {/* <Route path="/subscription" element={ <Subscription /> }/> */}
 
                {/* Protected Routes */}
                <Route
@@ -86,14 +86,14 @@ function Layout() {
                      </CheckAuthentication>
                   }
                />
-               {/* <Route
+               <Route
                   path="/subscription"
                   element={
                      <CheckAuthentication>
                         <Subscription />
                      </CheckAuthentication>
                   }
-               /> */}
+               />
                <Route
                   path="/playlist"
                   element={
