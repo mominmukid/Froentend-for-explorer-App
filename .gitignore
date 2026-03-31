@@ -12,8 +12,7 @@ bower_components
 psd
 thumb
 sketch
-# dotenv environment variables file
+# Ignore the .env file
 .env
-.env.test
-.env.production
+.env.sample
 # End of https://mrkandreev.name/snippets/gitignore-generator/#react
