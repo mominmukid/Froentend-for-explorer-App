@@ -1,6 +1,7 @@
 // src/store/commentSlice.js
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 const baseUrl = import.meta.env.VITE_BASE_URL;
+const uploadUrl = import.meta.env.VITE_BASE_URL_upload;
 import { STATUS } from "../utils/status";
 
 // initial state
@@ -46,7 +47,7 @@ export const createPlayList = createAsyncThunk(
       }
       console.log(formData);
 
-      const response = await fetch(`${baseUrl}/playlist/crete-playlist`, {
+      const response = await fetch(`${uploadUrl}/playlist/crete-playlist`, {
         method: "POST",
         credentials: "include",
         body: formData, // send FormData

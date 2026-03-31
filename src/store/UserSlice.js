@@ -3,6 +3,7 @@ import { STATUS } from "../utils/status";
 import axios from "axios";
 
 const baseUrl = import.meta.env.VITE_BASE_URL;
+const uploadUrl = import.meta.env.VITE_BASE_URL_upload;
 
 const initialState = {
   user: {},
@@ -70,7 +71,7 @@ export const ragisterAsyncUser = createAsyncThunk(
       if (avatar) formData.append("avatar", avatar[0]);
       if (coverImage) formData.append("coverImage", coverImage[0]);
 
-      const response = await axios.post(`${baseUrl}/users/register`, formData, {
+      const response = await axios.post(`${uploadUrl}/users/register`, formData, {
         withCredentials: true,
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -179,7 +180,7 @@ export const updateUserAvatar = createAsyncThunk(
       formData.append("avatar", file);
 
       const response = await axios.patch(
-        `${baseUrl}/users/update-avatar`,
+        `${uploadUrl}/users/update-avatar`,
         formData,
         {
           withCredentials: true,
@@ -205,7 +206,7 @@ export const updateUserBanner = createAsyncThunk(
       formData.append("coverImage", file);
 
       const response = await axios.patch(
-        `${baseUrl}/users/update-coverimage`,
+        `${uploadUrl}/users/update-coverimage`,
         formData,
         {
           withCredentials: true,

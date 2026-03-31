@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { STATUS } from "../utils/status";
 
 const baseUrl = import.meta.env.VITE_BASE_URL;
+const uploadUrl = import.meta.env.VITE_BASE_URL_upload;
 
 const initialState = {
   videos: [],
@@ -83,7 +84,7 @@ export const uploadVideo = createAsyncThunk(
       formData.append("category", category);
       if (videoFile) formData.append("video", videoFile[0]); // avatar file
       if (thumbnail) formData.append("thumbnel", thumbnail[0]); // cover image file
-      const response = await fetch(`${baseUrl}/videos/publishvideo`, {
+      const response = await fetch(`${uploadUrl}/videos/publishvideo`, {
         method: "POST",
         body: formData,
         credentials: "include", // send cookies
@@ -128,7 +129,7 @@ export const updateVideo = createAsyncThunk(
       const formData = new FormData();
       formData.append("video", video); // must match multer field name
 
-      const response = await fetch(`${baseUrl}/videos/updatevideo/${id}`, {
+      const response = await fetch(`${uploadUrl}/videos/updatevideo/${id}`, {
         method: "PATCH",
         credentials: "include", // send cookies
         body: formData,
@@ -153,7 +154,7 @@ export const updateThumnel = createAsyncThunk(
       const formData = new FormData();
       formData.append("Thumbnel", thumbnail); // must match multer field name
 
-      const response = await fetch(`${baseUrl}/videos/updade-thumnel/${id}`, {
+      const response = await fetch(`${uploadUrl}/videos/updade-thumnel/${id}`, {
         method: "PATCH",
         credentials: "include", // send cookies
         body: formData,
