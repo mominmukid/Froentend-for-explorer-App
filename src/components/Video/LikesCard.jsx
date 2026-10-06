@@ -1,6 +1,7 @@
 import React from "react";
 import { NavLink } from "react-router";
 import uploasedTime from "../../utils/uploadedTime";
+import formatDuration from "../../utils/formatDuration";
 
 function LikeCard({
   video: {
@@ -8,57 +9,61 @@ function LikeCard({
     description,
     title,
     duration,
-    owner: { username, avatar },
+    owner = {},
     thumbnail,
-    views,
     viewsCount,
     createdAt,
   },
 }) {
   const uploadBefore = uploasedTime(createdAt);
+  const username = owner?.username || "Creator";
+  const avatar = owner?.avatar || "/Images/profile.png";
 
   return (
     <NavLink to={`/video/${_id}`} state={{ _id }}>
-      {/* FIXED BG: 
-        - Changed bg-gray-200 to bg-white for better contrast on a light background. 
-        - Kept dark:bg-gray-800 for dark mode.
-        - Added shadow for separation.
-      */}
-      <div className="flex-1 sm:flex gap-4 p-3 rounded-lg bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-all mb-5">
-        
+      <div className="flex-1 sm:flex gap-4 p-3 rounded-xl bg-white dark:bg-gray-800 shadow-xs hover:shadow-md transition-all mb-4 border border-gray-100 dark:border-gray-700/60">
         {/* Thumbnail */}
-        <div className="relative flex-shrink-0 w-full sm:w-48 aspect-video rounded-lg overflow-hidden">
+        <div className="relative flex-shrink-0 w-full sm:w-48 aspect-video rounded-lg overflow-hidden bg-gray-200 dark:bg-gray-700">
           <img
-            src={thumbnail || "public/Images/alt.avif"}
-            alt={title}
-            className="w-full h-full object-cover"
+            src={thumbnail || "/Images/alt.avif"}
+            alt={title || "Video thumbnail"}
+            onError={(e) => {
+              e.currentTarget.src = "/Images/alt.avif";
+            }}
+            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
           />
-          {/* Duration badge fixed inside bottom-right */}
-          <span className="absolute bottom-2 right-2 bg-black bg-opacity-80 text-xs px-2 py-0.5 rounded text-white">
-            {(duration / 60).toFixed(2)}
+          <span className="absolute bottom-2 right-2 bg-black/80 text-xs px-1.5 py-0.5 rounded font-medium text-white">
+            {formatDuration(duration)}
           </span>
         </div>
 
         {/* Video Info */}
-        <div className="flex-1 min-w-0 mt-3 sm:mt-0">
-          <h3 className="font-medium mb-2 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer line-clamp-2 text-gray-900 dark:text-gray-100">
-            {title}
-          </h3>
-          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2 flex-wrap">
-            <img
-              src={avatar}
-              alt={username}
-              className="w-8 h-8 rounded-full object-cover"
-            />
-            <span className="text-gray-800 dark:text-gray-300">{username}</span>
-            <span>•</span>
-            <span>{viewsCount} views</span>
-            <span>•</span>
-            <span>{uploadBefore}</span>
+        <div className="flex-1 min-w-0 mt-3 sm:mt-0 flex flex-col justify-between">
+          <div>
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1.5 hover:text-blue-500 cursor-pointer line-clamp-2">
+              {title}
+            </h3>
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2 flex-wrap">
+              <img
+                src={avatar}
+                alt={username}
+                onError={(e) => {
+                  e.currentTarget.src = "/Images/profile.png";
+                }}
+                className="w-7 h-7 rounded-full object-cover"
+              />
+              <span className="font-medium text-gray-800 dark:text-gray-200">{username}</span>
+              <span>•</span>
+              <span>{viewsCount || 0} views</span>
+              <span>•</span>
+              <span>{uploadBefore}</span>
+            </div>
           </div>
-          <p className="hidden sm:block text-gray-600 dark:text-gray-400 text-sm line-clamp-2">
-            {description}
-          </p>
+          {description && (
+            <p className="hidden sm:block text-gray-500 dark:text-gray-400 text-xs line-clamp-2">
+              {description}
+            </p>
+          )}
         </div>
       </div>
     </NavLink>

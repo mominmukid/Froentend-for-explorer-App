@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import DashboardVideo from '../components/Video/DashboardVideo';
-import { MdCloudUpload } from "react-icons/md";
-import { useNavigate } from 'react-router';
-import { useSelector, useDispatch } from 'react-redux';
-import { getUser } from '../store/UserSlice';
-import { getvideosUser } from '../store/VideoFeatureSlice';
-import { getChannelSubscibres } from '../store/subscriptionSlice';
+import React, { useEffect, useState, useMemo, useCallback } from "react";
+import DashboardVideo from "../components/Video/DashboardVideo";
+import { MdCloudUpload, MdOutlineVideoLibrary, MdOutlineRemoveRedEye, MdPeopleOutline } from "react-icons/md";
+import { useNavigate } from "react-router";
+import { useSelector, useDispatch } from "react-redux";
+import { getUser } from "../store/UserSlice";
+import { getvideosUser } from "../store/VideoFeatureSlice";
+import { getChannelSubscibres } from "../store/subscriptionSlice";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -14,155 +14,201 @@ function Dashboard() {
   const dispatch = useDispatch();
   const [userVid, setUserVid] = useState([]);
   const [loadingVideos, setLoadingVideos] = useState(false);
-  const [loadingSubs, setLoadingSubs] = useState(false);
-  const [fallbackCover, setFallbackCover] = useState(null);
-  const [totalViews, setTotalViews] = useState(0);
   const [totalSubscribers, setTotalSubscribers] = useState([]);
-  // Load user from localStorage and set fallback cover
+
+  // Load user from localStorage
   useEffect(() => {
     const userData = localStorage.getItem("user");
     if (userData) {
-      const data = JSON.parse(userData);
-      setLocalUser(data.user)
-
-    }
-    setFallbackCover("https://picsum.photos/1600/400");
-  }, [reduxUser]);
-  const user = reduxUser?.user || localUser;
-  // Fetch videos
-  useEffect(() => {
-    const fetchVideo = async () => {
-      // if (!user) return;
-      setLoadingVideos(true);
       try {
-        const resultAction = await dispatch(getvideosUser());
-        if (getvideosUser.fulfilled.match(resultAction)) {
-          setUserVid(resultAction.payload || []);
-        }
-      } catch (error) {
-        console.error("Error fetching videos:", error);
-      } finally {
-        setLoadingVideos(false);
+        const data = JSON.parse(userData);
+        setLocalUser(data?.user || data);
+      } catch {
+        setLocalUser(null);
       }
-    };
-    fetchVideo();
-  }, []);
+    }
+  }, [reduxUser]);
 
-  // Fetch subscribers after localUser._id is available
+  const user = reduxUser?.username ? reduxUser : (reduxUser?.user || localUser);
+
+  // Fetch videos
+  const fetchVideos = useCallback(async () => {
+    setLoadingVideos(true);
+    try {
+      const resultAction = await dispatch(getvideosUser());
+      if (getvideosUser.fulfilled.match(resultAction)) {
+        setUserVid(resultAction.payload || []);
+      }
+    } catch (error) {
+      console.error("Error fetching videos:", error);
+    } finally {
+      setLoadingVideos(false);
+    }
+  }, [dispatch]);
+
   useEffect(() => {
-    if (!user?._id || !user) return;
+    fetchVideos();
+  }, [fetchVideos]);
+
+  // Fetch subscribers when user id is available
+  useEffect(() => {
+    const userId = user?._id;
+    if (!userId) return;
+
     const fetchSubscribers = async () => {
-      setLoadingSubs(true);
       try {
-        const resultAction = await dispatch(getChannelSubscibres(localUser._id));
+        const resultAction = await dispatch(getChannelSubscibres(userId));
         if (getChannelSubscibres.fulfilled.match(resultAction)) {
           setTotalSubscribers(resultAction.payload || []);
         }
       } catch (error) {
         console.error("Error fetching subscribers:", error);
-      } finally {
-        setLoadingSubs(false);
       }
     };
     fetchSubscribers();
-  }, [dispatch, localUser?._id]);
+  }, [dispatch, user?._id]);
+
+  const videoList = useMemo(() => {
+    if (!userVid || userVid.length === 0) return [];
+    const videos = userVid[0]?.userVideos || (Array.isArray(userVid) ? userVid : []);
+    return [...videos].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+  }, [userVid]);
+
+  const totalViews = useMemo(() => {
+    return videoList.reduce((acc, video) => acc + (Number(video.viewsCount) || 0), 0);
+  }, [videoList]);
+
+  const handleDeleteVideo = useCallback((deletedId) => {
+    setUserVid((prev) => {
+      if (!prev || !prev[0]) return prev;
+      return [
+        {
+          ...prev[0],
+          userVideos: (prev[0].userVideos || []).filter((v) => v._id !== deletedId),
+        },
+      ];
+    });
+  }, []);
 
   return (
-    <div className="flex relative min-h-screen">
-      {/* Loader overlay */}
-      {(loadingVideos || loadingSubs) && (
-        <div className="absolute inset-0  bg-opacity-40 flex flex-col items-center justify-center z-50">
-          <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-          <span className="mt-4 text-white font-medium text-lg">
-            {loadingVideos ? "Loading videos..." : "Loading subscribers..."}
-          </span>
-        </div>
-      )}
+    <div className="min-h-screen pb-16 max-w-7xl mx-auto px-4 pt-18">
+      {/* Cover Banner */}
+      <div className="w-full h-44 sm:h-56 md:h-64 rounded-3xl overflow-hidden relative shadow-md bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+        {user?.coverImage && (
+          <img
+            src={user.coverImage}
+            alt="Channel Cover"
+            className="w-full h-full object-cover"
+          />
+        )}
+      </div>
 
-      {/* Main Content */}
-      <main className="flex-1 p-6 pt-20">
-        {/* Header */}
-        <div className="w-full h-48 md:h-60 bg-gradient-to-r from-blue-500 to-purple-600">
-          {user?.coverImage ? (
-            <img src={user.coverImage} alt="Cover" className="w-full h-full object-cover" />
-          ) : (
-            <img src={fallbackCover} alt="Fallback Cover" className="w-full h-full object-cover" />
-          )}
-        </div>
-
-        {/* Profile Section */}
-        <div className="flex justify-center md:justify-between items-center px-6">
-          <div className="mt-[-2rem] flex flex-col md:flex-row items-center md:items-start">
-            {/* Avatar */}
+      {/* Profile Header */}
+      <div className="flex flex-col sm:flex-row items-center sm:items-end justify-between -mt-16 sm:-mt-14 px-4 sm:px-8 mb-8 gap-4">
+        <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 text-center sm:text-left">
+          <div className="relative z-0 w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-white dark:border-[#202222] shadow-xl bg-gray-200 dark:bg-gray-700">
             <img
-              src={user?.avatar || "https://i.pravatar.cc/150?img=5"}
-              alt="User Avatar"
-              className="w-32 h-32 rounded-full border-4 border-white dark:border-gray-900 shadow-lg object-cover"
+              src={user?.avatar || "/Images/profile.png"}
+              alt="Avatar"
+              onError={(e) => {
+                e.currentTarget.src = "/Images/profile.png";
+              }}
+              className="w-full h-full object-cover"
             />
+          </div>
+          <div className="pb-1">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white">
+              {user?.fullname || user?.username || "Creator Channel"}
+            </h1>
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              @{user?.username || "creator"}
+            </p>
+          </div>
+        </div>
 
-            {/* User Info */}
-            <div className="pt-12 md:mt-0 md:ml-6 text-center md:text-left">
-              <h2 className="text-2xl font-bold  text-gray-800 dark:text-gray-300">
-                {user?.fullname || "Update Full Name"}
-              </h2>
-              <p className="text-gray-800 dark:text-gray-300">
-                @{user?.username || "username"}
-              </p>
+        <button
+          onClick={() => navigate("/upload")}
+          className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#8b04a4] via-[#fd3243] to-[#e11755] text-white font-semibold rounded-xl shadow-md hover:opacity-95 transition cursor-pointer"
+        >
+          <MdCloudUpload className="text-xl" />
+          <span>Upload Video</span>
+        </button>
+      </div>
+
+      {/* Metrics / Stats Cards */}
+      <div className="relative z-10 grid grid-cols-1 sm:grid-cols-3 gap-5 mb-10">
+        <div className="bg-white dark:bg-gray-800/90 border border-gray-200 dark:border-gray-700/60 rounded-2xl p-5 shadow-xs flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center text-2xl">
+            <MdOutlineVideoLibrary />
+          </div>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">Total Videos</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{videoList.length}</p>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-gray-800/90 border border-gray-200 dark:border-gray-700/60 rounded-2xl p-5 shadow-xs flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 flex items-center justify-center text-2xl">
+            <MdOutlineRemoveRedEye />
+          </div>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">Total Views</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{totalViews.toLocaleString()}</p>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-gray-800/90 border border-gray-200 dark:border-gray-700/60 rounded-2xl p-5 shadow-xs flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center text-2xl">
+            <MdPeopleOutline />
+          </div>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">Subscribers</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{totalSubscribers.length.toLocaleString()}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Videos List Section */}
+      <div className="relative z-10">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Uploaded Videos</h2>
+          <span className="text-xs text-gray-500 font-medium">{videoList.length} total</span>
+        </div>
+
+        {loadingVideos ? (
+          <div className="space-y-4 animate-pulse">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-28 bg-gray-200 dark:bg-gray-800 rounded-2xl" />
+            ))}
+          </div>
+        ) : videoList.length > 0 ? (
+          <div className="flex flex-col gap-3.5">
+            {videoList.map((video) => (
+              <DashboardVideo
+                key={video._id}
+                video={video}
+                handleDeleteVideo={handleDeleteVideo}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="bg-white dark:bg-gray-800/60 border border-dashed border-gray-300 dark:border-gray-700 rounded-3xl p-12 text-center">
+            <div className="w-14 h-14 rounded-full bg-red-50 dark:bg-red-950/30 text-red-500 flex items-center justify-center mx-auto text-2xl mb-3">
+              <MdCloudUpload />
             </div>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">No videos uploaded yet</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm mx-auto mb-5">
+              Upload your first video to share it with the world and build your audience!
+            </p>
+            <button
+              onClick={() => navigate("/upload")}
+              className="px-5 py-2.5 bg-gradient-to-r from-[#8b04a4] via-[#fd3243] to-[#e11755] text-white font-medium rounded-xl shadow-xs hover:opacity-95 transition cursor-pointer"
+            >
+              Upload Video
+            </button>
           </div>
-        </div>
-
-        {/* Dashboard Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Creator Dashboard</h1>
-          <p className="text-gray-600 dark:text-gray-200">
-            Manage your content and track performance
-          </p>
-        </div>
-
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-gray-200 rounded-lg p-6">
-            <h3 className="text-gray-700 text-sm font-medium mb-2">Total Views</h3>
-            <p className="text-2xl font-bold dark:text-gray-800">{totalViews}</p>
-          </div>
-          <div className="bg-gray-200 rounded-lg p-6">
-            <h3 className="text-gray-700 text-sm font-medium mb-2">Subscribers</h3>
-            <p className="text-2xl font-bold dark:text-gray-800">{totalSubscribers?.length || 0}</p>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-wrap gap-4 mb-8">
-          <button
-            className="bg-gradient-to-r from-[#8b04a4] via-[#fd3243] to-[#e11755] hover:scale-102 px-6 py-3 rounded-lg font-medium flex items-center gap-2 text-white"
-            onClick={() => navigate('/upload')}
-          >
-            <MdCloudUpload />
-            Upload Video
-          </button>
-        </div>
-
-        {/* Videos Section */}
-        <div className="flex flex-col gap-4">
-          {!loadingVideos && userVid && userVid[0]?.userVideos?.length > 0 ? (
-            [...userVid[0].userVideos]
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-               .map((video) => (
-
-                <DashboardVideo
-                  key={video._id}
-                  video={video}
-                  user={userVid[0]}
-                  setTotalViews={setTotalViews}
-                  totalViews={totalViews}
-                />
-              ))
-          ) : !loadingVideos ? (
-            <p className="text-gray-700 dark:text-gray-200">No videos uploaded yet.</p>
-          ) : null}
-        </div>
-      </main>
+        )}
+      </div>
     </div>
   );
 }

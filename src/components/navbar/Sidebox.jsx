@@ -1,53 +1,83 @@
-import { MdSavedSearch } from "react-icons/md";
-import { FaAudible } from "react-icons/fa";
-import { IoEarthOutline } from "react-icons/io5";
-import { PiSignInBold } from "react-icons/pi";
-import { FaLinkedin } from "react-icons/fa";
+import React from "react";
+import { FaLinkedin, FaHistory } from "react-icons/fa";
 import { VscGithub } from "react-icons/vsc";
 import { BsPersonVcard } from "react-icons/bs";
-import { MdArrowOutward } from "react-icons/md";
-import { RxCross1 } from "react-icons/rx";
 import { IoMdHome } from "react-icons/io";
-import { MdOutlinePlaylistPlay } from "react-icons/md";
-import { FaHistory } from "react-icons/fa";
+import { MdOutlinePlaylistPlay, MdSubscriptions } from "react-icons/md";
 import { AiOutlineLike } from "react-icons/ai";
-import { MdSubscriptions } from "react-icons/md";
 import { NavLink } from "react-router";
 import { useSelector } from "react-redux";
 
 function SideBox() {
-  const toggle = useSelector(state => state.video.isvisibal);
+  const toggle = useSelector((state) => state.video.isvisibal);
+
+  const navLinks = [
+    { to: "/", label: "Home", icon: <IoMdHome className="text-xl" /> },
+    { to: "/playlist", label: "Playlists", icon: <MdOutlinePlaylistPlay className="text-2xl" /> },
+    { to: "/history", label: "History", icon: <FaHistory className="text-lg" /> },
+    { to: "/subscription", label: "Subscriptions", icon: <MdSubscriptions className="text-xl" /> },
+    { to: "/like", label: "Liked Videos", icon: <AiOutlineLike className="text-xl" /> },
+  ];
+
   return (
-    <div className={` hidden  flex-col justify-between w-[240px] dark:bg-[#202222] h-screen fixed top-0 left-0 overflow-y-auto border-r-2 border-gray-100 dark:border-[#181818] ${toggle ? "md:flex" : "hidden"}`}>
-      {/* Sidebar content */}
-      <div className="flex flex-col items-center w-full">
-        {/* Navigation Links */}
-        <div className="w-[98%]  flex flex-col gap-3 mt-20">
-          {/* for home for mobile screen */}
-          <NavLink to="/" className='w-full hover:bg-gray-300  cursor-pointer rounded-full flex justify-start pl-5  gap-2 p-2 transition  duration-100 ease-in-out dark:text-white dark:hover:bg-gray-800   '><span className='flex justify-center items-center text-xl '><IoMdHome /> </span> <span className='font-bold text-gray-700 dark:text-gray-100'>Home</span></NavLink>
-
-          {/* for playlist for mobile screen */}
-          <NavLink to="/playlist" className='w-full hover:bg-gray-300  cursor-pointer rounded-full flex justify-start pl-5  gap-2 p-2 transition  duration-100 ease-in-out dark:text-white dark:hover:bg-gray-800'><span className='flex justify-center items-center text-2xl'><MdOutlinePlaylistPlay /> </span> <span className='font-bold text-gray-700 dark:text-gray-100'>playlists</span></NavLink>
-          {/* for History for mobile screen */}
-          <NavLink to="/history" className='w-full hover:bg-gray-300  cursor-pointer rounded-full flex justify-start pl-5  gap-2 p-2 transition  duration-100 ease-in-out dark:text-white dark:hover:bg-gray-800'><span className='flex justify-center items-center text-xl'><FaHistory /> </span> <span className='font-bold text-gray-700 dark:text-gray-100 '>History</span></NavLink>
-          {/* for Subscription for mobile screen */}
-          <NavLink to="/subscription" className='w-full hover:bg-gray-200  cursor-pointer rounded-full flex justify-start pl-5  gap-2 p-2 transition  duration-100 ease-in-out dark:text-white dark:hover:bg-gray-800'><span className='flex justify-center items-center text-xl'>< MdSubscriptions /> </span> <span className='font-bold text-gray-700 dark:text-gray-100 '>Subsciption</span></NavLink>
-          {/* for liked for mobile screen */}
-          <NavLink to="/like" className='w-full hover:bg-gray-200  cursor-pointer rounded-full flex justify-start pl-5  gap-2 p-2 transition  duration-100 ease-in-out dark:text-white dark:hover:bg-gray-800'><span className='flex justify-center items-center text-xl '><AiOutlineLike /> </span> <span className='font-bold text-gray-700 dark:text-gray-100'>Liked</span></NavLink>
-          {/* Cancle button */}
-        </div>
+    <aside
+      className={`hidden flex-col justify-between w-[240px] bg-white dark:bg-[#202222] h-screen fixed top-0 left-0 overflow-y-auto border-r border-gray-200 dark:border-gray-800 transition-all duration-300 z-40 ${
+        toggle ? "md:flex" : "hidden"
+      }`}
+    >
+      {/* Navigation Links */}
+      <div className="w-full flex flex-col items-center pt-20 px-3">
+        <nav className="w-full flex flex-col gap-1.5">
+          {navLinks.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) =>
+                `w-full flex items-center gap-3.5 px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-150 ${
+                  isActive
+                    ? "bg-red-50 text-red-600 dark:bg-red-950/40 dark:text-red-400 font-semibold shadow-xs"
+                    : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800/80"
+                }`
+              }
+            >
+              <span className="flex items-center justify-center">{item.icon}</span>
+              <span>{item.label}</span>
+            </NavLink>
+          ))}
+        </nav>
       </div>
-      {/* Bottom Icons */}
-      <div className="w-full border-t-2 border-gray-100  p-3 flex justify-between items-center dark:border-[#181818]">
-        <a href="https://www.linkedin.com/in/mukid-momin" target="_blank">
-          <p className="p-2  dark:hover:text-white dark:hover:bg-gray-400/10 rounded-full cursor-pointer hover:bg-gray-300 text-blue-700 text-xl"><FaLinkedin /></p></a>
-        <a href="https://github.com/mominmukid " target="_blank">
-          <p className="p-2 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-400/10 rounded-full cursor-pointer hover:bg-gray-300 text-xl"><VscGithub /></p></a>
-          <a href="https://mukid-portfolio.netlify.app" target="_blank">
-        <p className="p-2  dark:hover:text-white dark:hover:bg-gray-400/10 rounded-full cursor-pointer hover:bg-gray-300 text-xl  text-[#1e9fab]"><BsPersonVcard /></p></a>
 
+      {/* Bottom Creator Links */}
+      <div className="w-full border-t border-gray-100 dark:border-gray-800 p-3 flex justify-around items-center">
+        <a
+          href="https://www.linkedin.com/in/mukid-momin"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="LinkedIn Profile"
+          className="p-2.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-blue-600 transition"
+        >
+          <FaLinkedin className="text-xl" />
+        </a>
+        <a
+          href="https://github.com/mominmukid"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="GitHub Profile"
+          className="p-2.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 transition"
+        >
+          <VscGithub className="text-xl" />
+        </a>
+        <a
+          href="https://mukid-portfolio.netlify.app"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Portfolio"
+          className="p-2.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-[#1e9fab] transition"
+        >
+          <BsPersonVcard className="text-xl" />
+        </a>
       </div>
-    </div>
+    </aside>
   );
 }
 

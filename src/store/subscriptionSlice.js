@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { STATUS } from "../utils/status";
 
-const baseUrl = import.meta.env.VITE_BASE_URL;
+import { BASE_URL as baseUrl } from "../utils/apiConfig";
 
 const initialState = {};
 

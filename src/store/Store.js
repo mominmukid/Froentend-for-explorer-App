@@ -16,7 +16,7 @@ const store = configureStore({
     user: userReducer,
     subscription: subscriptionReducer,
     like: likeReducer,
-    palylist: playlistReducer,
+    playlist: playlistReducer,
     search: searchReducer,
   },
 });

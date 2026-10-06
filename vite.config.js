@@ -6,6 +6,17 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
-    historyApiFallback: true, // ensures dev server also handles routes
+    historyApiFallback: true,
+  },
+  build: {
+    rollupOptions: {
+      external: ["chart.js/auto"],
+      output: {
+        manualChunks: {
+          vendor: ["react", "react-dom", "react-router", "react-router-dom", "react-redux", "@reduxjs/toolkit"],
+          ui: ["react-icons", "react-toastify"],
+        },
+      },
+    },
   },
 });

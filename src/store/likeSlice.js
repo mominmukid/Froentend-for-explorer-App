@@ -1,16 +1,107 @@
-// src/store/commentSlice.js
+// src/store/likeSlice.js
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-const baseUrl = import.meta.env.VITE_BASE_URL;
-import { STATUS } from "../utils/status";
+import { BASE_URL as baseUrl } from "../utils/apiConfig";
 
-// initial state
 const initialState = {
   likes: [],
   likesStatus: true,
 };
 
+export const addAsyncCommentLike = createAsyncThunk(
+  "likes/toggleCommentLike",
+  async (id, { rejectWithValue }) => {
+    try {
+      if (!id) return;
+      let response = await fetch(`${baseUrl}/like/togglecomment/${id}`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      // Fallback if backend uses /like/toggle/c/:id
+      if (!response.ok && response.status === 404) {
+        response = await fetch(`${baseUrl}/like/toggle/c/${id}`, {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to toggle comment like");
+      }
+
+      const data = await response.json();
+      return data?.data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const fetchAsyncCommentLike = createAsyncThunk(
+  "likes/fetchCommentLikes",
+  async (id, { rejectWithValue }) => {
+    if (!id) return [];
+    try {
+      let response = await fetch(`${baseUrl}/like/getcommentlikes/${id}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
+
+      if (!response.ok && response.status === 404) {
+        response = await fetch(`${baseUrl}/like/comment/${id}`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        });
+      }
+
+      if (!response.ok) {
+        return [];
+      }
+      const data = await response.json();
+      return data?.data || [];
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const getVideoLikes = createAsyncThunk(
+  "likes/getVideoLikes",
+  async (id, { rejectWithValue }) => {
+    if (id === undefined) return [];
+    try {
+      let response = await fetch(`${baseUrl}/like/getvideolikes/${id}`, {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (!response.ok && response.status === 404) {
+        response = await fetch(`${baseUrl}/like/video/${id}`, {
+          method: "GET",
+          credentials: "include",
+        });
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to fetch video likes");
+      }
+
+      const data = await response.json();
+      return data?.data || [];
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const likeSlice = createSlice({
-  name: "comment",
+  name: "like",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -23,74 +114,5 @@ const likeSlice = createSlice({
       });
   },
 });
-
-export const addAsyncCommentLike = createAsyncThunk(
-  "comments/add",
-  async (id, { rejectWithValue }) => {
-    try {
-      if (!id) return;
-      const response = await fetch(`${baseUrl}/like/togglecomment/${id}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to add comment");
-      }
-      return; // the new comment object
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const fetchAsyncCommentLike = createAsyncThunk(
-  "comments/fetch",
-  async (id, { rejectWithValue }) => {
-    if (!id) return;
-    try {
-      const response = await fetch(`${baseUrl}/like/getcommentlikes/${id}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to add comment");
-      }
-      const data = await response.json();
-
-      return data.data; // the new comment object
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const getVideoLikes = createAsyncThunk(
-  "/video/like",
-  async (id, { rejectWithValue }) => {
-    if (id === undefined) return;
-    try {
-      const response = await fetch(`${baseUrl}/like/getvideolikes/${id}`, {
-        method: "GET",
-        credentials: "include", // ✅ sends cookies along with the request
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to fetch history");
-      }
-
-      const data = await response.json();
-      return data.data;
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
 
 export default likeSlice.reducer;

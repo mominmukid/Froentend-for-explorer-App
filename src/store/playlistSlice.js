@@ -1,7 +1,6 @@
 // src/store/commentSlice.js
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-const baseUrl = import.meta.env.VITE_BASE_URL;
-const uploadUrl = import.meta.env.VITE_BASE_URL_upload;
+import { BASE_URL as baseUrl, UPLOAD_URL as uploadUrl } from "../utils/apiConfig";
 import { STATUS } from "../utils/status";
 
 // initial state

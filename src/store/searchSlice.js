@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-const baseUrl = import.meta.env.VITE_BASE_URL;
+import { BASE_URL } from "../utils/apiConfig";
 import { STATUS } from "../utils/status";
 
 const initialState = {
@@ -7,13 +7,13 @@ const initialState = {
   searchVideosStatus: STATUS.IDLE,
 };
 
-// ✅ New thunk for searching videos
+// Thunk for searching videos
 export const searchAllVideos = createAsyncThunk(
   "search/allvideos",
   async ({ searchTerm, page = 1, limit = 20 }, { rejectWithValue }) => {
     try {
       const response = await fetch(
-        `${baseUrl}/videos/getall-videos?query=${encodeURIComponent(
+        `${BASE_URL}/videos/getall-videos?query=${encodeURIComponent(
           searchTerm || ""
         )}&page=${page}&limit=${limit}`,
         {
@@ -28,7 +28,7 @@ export const searchAllVideos = createAsyncThunk(
       }
 
       const data = await response.json();
-      return data.data; // ✅ assuming your ApiResponce sends { status, data, message }
+      return data.data;
     } catch (error) {
       return rejectWithValue(error.message || "Something went wrong");
     }
@@ -38,14 +38,19 @@ export const searchAllVideos = createAsyncThunk(
 const searchSlice = createSlice({
   name: "search",
   initialState,
-  reducers: {},
+  reducers: {
+    clearSearch: (state) => {
+      state.searchVideos = [];
+      state.searchVideosStatus = STATUS.IDLE;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(searchAllVideos.pending, (state) => {
         state.searchVideosStatus = STATUS.LOADING;
       })
       .addCase(searchAllVideos.fulfilled, (state, action) => {
-        state.searchVideos = action.payload;
+        state.searchVideos = action.payload || [];
         state.searchVideosStatus = STATUS.SUCCEEDED;
       })
       .addCase(searchAllVideos.rejected, (state) => {
@@ -54,6 +59,7 @@ const searchSlice = createSlice({
   },
 });
 
+export const { clearSearch } = searchSlice.actions;
 export const selectSearchVideos = (state) => state.search.searchVideos;
 export const selectSearchStatus = (state) => state.search.searchVideosStatus;
 export default searchSlice.reducer;

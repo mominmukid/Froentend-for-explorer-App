@@ -1,0 +1,1 @@
+function $(t){if(!t||isNaN(t)||t<=0)return"0:00";const r=Math.floor(Number(t)),a=Math.floor(r/3600),o=Math.floor(r%3600/60),n=r%60,s=n<10?`0${n}`:`${n}`;if(a>0){const u=o<10?`0${o}`:`${o}`;return`${a}:${u}:${s}`}return`${o}:${s}`}export{$ as f};
